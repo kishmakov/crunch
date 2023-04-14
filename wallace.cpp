@@ -13,7 +13,7 @@ void initFirstColumn(Column& column, int bitness) {
 
 bool isTrivial(Column& column) {
     return std::all_of(column.cbegin(), column.cend(),
-                       [](int v) { return v <= 1; });
+                       [](int v) { return v <= 2; });
 }
 
 int roundsUp(int output) {

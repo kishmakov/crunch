@@ -7,13 +7,6 @@
 const unsigned randSeed = 20230402;
 
 int main() {
-
-    for (int n = 1; n <= 32; n++) {
-        std::cout << std::setw(3) << n << " , ";
-        std::cout << std::setw(3) << depthOfWallaceTree(n);
-        std::cout << std::endl;
-    }
-
 //    std::srand(randSeed);
 //
 //    for (int i = 0; i < 10; i++) {
