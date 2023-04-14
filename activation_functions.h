@@ -1,0 +1,6 @@
+#ifndef CRUNCH_ACTIVATION_FUNCTIONS_H
+#define CRUNCH_ACTIVATION_FUNCTIONS_H
+
+double sigmoid(double x);
+
+#endif //CRUNCH_ACTIVATION_FUNCTIONS_H
