@@ -39,6 +39,14 @@ Weights& Weights::operator-=(const Weights& correction) {
     return *this;
 }
 
+Weights& Weights::operator*=(double mult) {
+    for (auto& w: weights_) {
+        w *= mult;
+    }
+
+    return *this;
+}
+
 double& Weights::operator[](unsigned index) {
     if (index >= SIZE) {
         throw std::out_of_range("Index out of range");

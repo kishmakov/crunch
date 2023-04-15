@@ -13,6 +13,7 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const Weights& obj);
     Weights& operator-=(const Weights& correction);
+    Weights& operator*=(double mult);
     double& operator[](unsigned index);
     const double& operator[](unsigned index) const;
 

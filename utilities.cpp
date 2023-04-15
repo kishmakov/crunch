@@ -35,10 +35,7 @@ Weights correctionMSE(const std::vector<Case>& cases, const Weights& w) {
         count += 1;
     }
 
-    for (int wn = 0; wn < Weights::SIZE; ++wn) {
-        correction[wn] /= count;
-    }
-
+    correction *= 1.0 / count;
     return correction;
 }
 
