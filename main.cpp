@@ -1,23 +1,13 @@
-#include <iostream>
-#include <bitset>
+#include <cmath>
 #include <iomanip>
+#include <iostream>
 
+#include "Case.h"
 #include "common.h"
 #include "utilities.h"
+#include "network.h"
 
 const unsigned randSeed = 20230402;
-
-std::vector<Case> trainingCases() {
-    std::vector<Case> result(0);
-
-    for (uint16_t n1 = 0; n1 < 4; ++n1) {
-        for (uint16_t n2 = 0; n2 < 4; ++n2) {
-            result.emplace_back(n1, n2);
-        }
-    }
-
-    return result;
-}
 
 Weights initialWeights() {
     Weights weights(WEIGHTS_NUM, 0.0);
@@ -32,7 +22,7 @@ Weights initialWeights() {
 int main() {
     std::srand(randSeed);
 
-    auto cases = trainingCases();
+    auto cases = Case::trainingSet();
 
     auto weights = initialWeights();
 
@@ -51,6 +41,16 @@ int main() {
 
         std::cout << std::endl;
     }
+
+    int score = 0;
+
+    for (const auto& cs: cases) {
+        double actual = networkComputation(cs, weights);
+
+        if (std::round(cs.getTarget()) == std::round(actual)) score++;
+    }
+
+    std::cout << score << " out of " << cases.size() << std::endl;
 
     return 0;
 }
