@@ -5,8 +5,8 @@
 #include <vector>
 
 class Case {
-    const static uint64_t BITNESS = 2;
-    const static uint64_t MASK = ((1 << BITNESS) - 1);
+    const static uint64_t BITNESS;
+    const static uint64_t MASK;
 
     Case(uint64_t asBits, uint64_t m1, uint64_t m2) {
         bits_ = asBits;
@@ -18,7 +18,9 @@ public:
     Case(uint64_t m1, uint64_t m2) : Case((m1 << BITNESS) | m2, m1, m2) {}
 
     inline double getTarget() const { return target_; }
-    inline double getInput(unsigned number) const { return double((bits_ >> number) & 1); }
+    inline double getInput(unsigned number) const {
+        return number >= 2 * BITNESS ? -1.0 : double((bits_ >> number) & 1);
+    }
 
     static std::vector<Case> trainingSet();
 

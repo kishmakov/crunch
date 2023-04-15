@@ -1,5 +1,8 @@
 #include "Case.h"
 
+const uint64_t Case::BITNESS = 2;
+const uint64_t Case::MASK = ((1 << BITNESS) - 1);
+
 std::vector<Case> Case::trainingSet() {
     std::vector<Case> result;
 
