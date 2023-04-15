@@ -14,3 +14,11 @@ std::vector<Case> Case::trainingSet() {
 
     return result;
 }
+
+double Case::getInput(unsigned number) const {
+    if (number >= 2 * BITNESS) {
+        throw std::out_of_range("Index out of range");
+    }
+
+    return double((bits_ >> number) & 1);
+}

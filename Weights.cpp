@@ -39,6 +39,15 @@ Weights& Weights::operator-=(const Weights& correction) {
     return *this;
 }
 
+Weights& Weights::operator+=(const Weights& correction) {
+    for (unsigned i = 0; i < SIZE; i++) {
+        weights_[i] += correction.weights_[i];
+    }
+
+    return *this;
+}
+
+
 Weights& Weights::operator*=(double mult) {
     for (auto& w: weights_) {
         w *= mult;

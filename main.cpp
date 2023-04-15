@@ -5,7 +5,7 @@
 #include "Case.h"
 #include "Weights.h"
 #include "utilities.h"
-#include "network.h"
+#include "NetworkComputation.h"
 
 const unsigned randSeed = 20230402;
 
@@ -29,10 +29,9 @@ int main() {
 
     int score = 0;
 
-    for (const auto& cs: cases) {
-        double actual = networkComputation(cs, weights);
-
-        if (std::round(cs.getTarget()) == std::round(actual)) score++;
+    for (const auto& kase: cases) {
+        NetworkComputation computation(kase, weights);
+        if (std::round(kase.getTarget()) == std::round(computation.getActual())) score++;
     }
 
     std::cout << score << " out of " << cases.size() << std::endl;

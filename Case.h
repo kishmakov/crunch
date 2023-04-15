@@ -14,15 +14,13 @@ class Case {
     }
 
 public:
-    Case(uint64_t asBits) : Case(asBits, MASK & asBits, MASK & (asBits >> BITNESS)) {}
+    explicit Case(uint64_t asBits) : Case(asBits, MASK & asBits, MASK & (asBits >> BITNESS)) {}
     Case(uint64_t m1, uint64_t m2) : Case((m1 << BITNESS) | m2, m1, m2) {}
 
-    inline double getTarget() const { return target_; }
-    inline double getInput(unsigned number) const {
-        return number >= 2 * BITNESS ? -1.0 : double((bits_ >> number) & 1);
-    }
-
     static std::vector<Case> trainingSet();
+
+    [[nodiscard]] inline double getTarget() const { return target_; }
+    [[nodiscard]] double getInput(unsigned number) const;
 
 private:
     uint64_t bits_;
