@@ -2,7 +2,7 @@
 
 #include "Weights.h"
 
-const uint64_t Weights::SIZE = 5;
+const uint64_t Weights::SIZE = 25;
 
 double randomInRange(double min, double max) {
     return min + ((max - min) * rand()) / (RAND_MAX);

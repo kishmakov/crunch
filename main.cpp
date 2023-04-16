@@ -16,15 +16,15 @@ int main() {
 
     auto weights = Weights::randomlyChosen(-5.0, 5.0);
 
-    for (int trialNumber = 0; trialNumber < 10000; trialNumber++) {
+    for (int trialNumber = 0; trialNumber < 500000; trialNumber++) {
         double result = metricsMSE(cases, weights);
-
         weights -= correctionMSE(cases, weights);
 
-        std::cout << std::setw(3) << trialNumber << ": ";
-        std::cout << std::setw(10) << result << " <-" << weights;
-
-        std::cout << std::endl;
+        if (trialNumber % 1000 == 0) {
+            std::cout << std::setw(3) << trialNumber << ": ";
+            std::cout << std::setw(10) << result << " <-" << weights;
+            std::cout << std::endl;
+        }
     }
 
     int score = 0;

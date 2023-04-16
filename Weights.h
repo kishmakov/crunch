@@ -18,8 +18,6 @@ public:
     double& operator[](unsigned index);
     const double& operator[](unsigned index) const;
 
-    inline double bias() const { return weights_[SIZE - 1]; }
-
 private:
     std::vector<double> weights_;
 };
