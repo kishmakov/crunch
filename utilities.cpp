@@ -17,7 +17,7 @@ Weights correctionMSE(const std::vector<Case>& cases, const Weights& weights) {
     Weights correction = Weights::zeroed();
 
     for (const auto& kase: cases) {
-        auto computation = NetworkComputation::compute(kase, weights);
+        auto computation = NetworkComputation(kase, weights);
         correction += computation.backPropagation();
     }
 

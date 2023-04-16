@@ -8,23 +8,21 @@ NetworkComputation::NetworkComputation(const Case& kase, const Weights& weights)
     double x = 0;
 
     for (unsigned wn = 0; wn < Weights::SIZE; wn++) {
-        x += getInput(wn) * weights[wn];
+        x += getInput(wn) * weights_[wn];
     }
 
     actual_ = sigmoid(x);
 }
 
-NetworkComputation NetworkComputation::compute(const Case& kase, const Weights& weights) {
-    NetworkComputation computation(kase, weights);
-    computation.runBackPropagation();
-    return computation;
-}
+Weights NetworkComputation::backPropagation() const {
+    Weights correction = Weights::zeroed();
 
-void NetworkComputation::runBackPropagation() {
     double target = case_.getTarget();
 
     for (unsigned wn = 0; wn < Weights::SIZE; ++wn) {
         double contrib = (actual_ - target) * actual_ * (1 - actual_) * getInput(wn);
-        backPropagation_[wn] += contrib;
+        correction[wn] += contrib;
     }
+
+    return std::move(correction);
 }
