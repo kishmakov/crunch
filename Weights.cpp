@@ -1,3 +1,4 @@
+#include <fstream>
 #include <iomanip>
 
 #include "Weights.h"
@@ -47,7 +48,6 @@ Weights& Weights::operator+=(const Weights& correction) {
     return *this;
 }
 
-
 Weights& Weights::operator*=(double mult) {
     for (auto& w: weights_) {
         w *= mult;
@@ -70,4 +70,16 @@ const double& Weights::operator[](unsigned index) const {
     }
 
     return weights_[index];
+}
+
+Weights::Weights(std::string fileName) : weights_() {
+    std::ifstream fin(fileName);
+
+    double weight;
+
+    while (fin >> weight) {
+        weights_.push_back(weight);
+    }
+
+    fin.close();
 }

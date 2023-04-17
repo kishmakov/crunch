@@ -2,39 +2,72 @@
 #include <iomanip>
 #include <iostream>
 
+#include <matplot/matplot.h>
+
 #include "Case.h"
-#include "Weights.h"
-#include "utilities.h"
 #include "NetworkComputation.h"
+#include "training.h"
+#include "utilities.h"
+#include "Weights.h"
 
-const unsigned randSeed = 20230402;
+const unsigned RAND_SEED = 20230402;
 
-int main() {
-    std::srand(randSeed);
+const std::string MODE_TRAIN = "train";
+const std::string MODE_CHECK = "check";
+
+void trainNetwork(std::string fileName) {
+    srand(RAND_SEED);
+    auto weights = Weights::randomlyChosen(-5.0, 5.0);
 
     auto cases = Case::trainingSet();
 
-    auto weights = Weights::randomlyChosen(-5.0, 5.0);
+    auto tr = runTraining(cases, weights, 500000, 1000);
 
-    for (int trialNumber = 0; trialNumber < 500000; trialNumber++) {
-        double result = metricsMSE(cases, weights);
-        weights -= correctionMSE(cases, weights);
+    std::ofstream fout(fileName, std::ios::out);
 
-        if (trialNumber % 1000 == 0) {
-            std::cout << std::setw(3) << trialNumber << ": ";
-            std::cout << std::setw(10) << result << " <-" << weights;
-            std::cout << std::endl;
-        }
-    }
+    fout << tr.result;
+}
+
+void checkNetwork(std::string fileName) {
+    Weights weights(fileName);
+
+    auto cases = Case::trainingSet();
 
     int score = 0;
 
     for (const auto& kase: cases) {
         NetworkComputation computation(kase, weights);
-        if (std::round(kase.getTarget()) == std::round(computation.getActual())) score++;
+        if (round(kase.getTarget()) == round(computation.getActual())) score++;
+        for (unsigned i = 0; i < 4; ++i) {
+            std::cout << i << "=" << kase.getInput(i) << " ";
+        }
+        std::cout << ": t=" << kase.getTarget();
+        std::cout << " a=" << computation.getActual();
+        std::cout << std::endl;
     }
 
     std::cout << score << " out of " << cases.size() << std::endl;
+}
+
+
+int main(int argc, char* argv[]) {
+    if (argc != 3) {
+        std::cerr << "Error: not enough arguments." << std::endl;
+        std::cerr << "Usage: crunch <mode> <file name>" << std::endl;
+        return 1;
+    }
+
+    std::string mode(argv[1]);
+    std::string fileName(argv[2]);
+
+    if (mode == MODE_TRAIN) {
+        trainNetwork(fileName);
+    }
+
+    if (mode == MODE_CHECK) {
+        checkNetwork(fileName);
+    }
 
     return 0;
 }
+

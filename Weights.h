@@ -8,8 +8,10 @@ class Weights {
 
 public:
     const static uint64_t SIZE;
+
     static Weights randomlyChosen(double min, double max);
     static Weights zeroed();
+    explicit Weights(std::string fileName);
 
     friend std::ostream& operator<<(std::ostream& os, const Weights& obj);
     Weights& operator-=(const Weights& correction);
