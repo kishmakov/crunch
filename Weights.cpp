@@ -26,7 +26,7 @@ Weights Weights::zeroed() {
 
 std::ostream& operator<<(std::ostream& os, const Weights& weights) {
     for (const auto& w: weights.weights_) {
-        os << std::setw(10) << w;
+        os << std::setprecision(9) << w << std::endl;
     }
 
     return os;
