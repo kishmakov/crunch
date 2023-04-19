@@ -1,5 +1,8 @@
-#include "utilities.h"
+#include <fstream>
+#include <string>
+
 #include "NetworkComputation.h"
+#include "utilities.h"
 
 
 double metricsMSE(const std::vector<Case>& cases, const Weights& weights) {
@@ -23,5 +26,16 @@ Weights correctionMSE(const std::vector<Case>& cases, const Weights& weights) {
 
     correction *= 1.0 / double(cases.size());
     return correction;
+}
+
+[[maybe_unused]] inline std::string fullWeightsName(const std::string& base) { return base + ".txt"; }
+
+void saveWeights(const std::string& baseName, const Weights& weights) {
+    std::ofstream fout(fullWeightsName(baseName), std::ios::out);
+    fout << weights;
+}
+
+Weights loadWeights(const std::string& baseName) {
+    return Weights(fullWeightsName(baseName));
 }
 

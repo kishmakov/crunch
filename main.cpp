@@ -1,5 +1,4 @@
 #include <cmath>
-#include <iomanip>
 #include <iostream>
 
 #include <matplot/matplot.h>
@@ -15,21 +14,40 @@ const unsigned RAND_SEED = 20230402;
 const std::string MODE_TRAIN = "train";
 const std::string MODE_CHECK = "check";
 
-void trainNetwork(std::string fileName) {
-    srand(RAND_SEED);
+void trainNetwork(const std::string& baseName, unsigned randSeed) {
+    srand(randSeed);
+
     auto weights = Weights::randomlyChosen(-5.0, 5.0);
 
     auto cases = Case::trainingSet();
 
     auto tr = runTraining(cases, weights, 500000, 1000);
 
-    std::ofstream fout(fileName, std::ios::out);
+    saveWeights(baseName, tr.result);
 
-    fout << tr.result;
+    std::vector<double> xs;
+    std::vector<double> ys;
+    xs.reserve(tr.history.size());
+    ys.reserve(tr.history.size());
+
+    double step = 1.0 / tr.history.size();
+    double x = 0.0;
+
+    for (const auto& weights: tr.history) {
+        xs.push_back(x);
+        ys.push_back(log(metricsMSE(cases, weights)));
+
+        x += step;
+    }
+
+    using namespace matplot;
+
+    plot(xs, ys, "-");
+    show();
 }
 
-void checkNetwork(std::string fileName) {
-    Weights weights(fileName);
+void checkNetwork(const std::string& baseName) {
+    Weights weights = loadWeights(baseName);
 
     auto cases = Case::trainingSet();
 
@@ -61,7 +79,7 @@ int main(int argc, char* argv[]) {
     std::string fileName(argv[2]);
 
     if (mode == MODE_TRAIN) {
-        trainNetwork(fileName);
+        trainNetwork(fileName, RAND_SEED);
     }
 
     if (mode == MODE_CHECK) {
