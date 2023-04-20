@@ -25,25 +25,36 @@ void trainNetwork(const std::string& baseName, unsigned randSeed) {
 
     saveWeights(baseName, tr.result);
 
-    std::vector<double> xs;
-    std::vector<double> ys;
-    xs.reserve(tr.history.size());
-    ys.reserve(tr.history.size());
+    std::vector<double> iterations;
+    std::vector<double> metrics;
+    std::vector<double> coeffDiffs;
 
-    double step = 1.0 / tr.history.size();
+    double lastCF = tr.history.back()[0];
+
+    iterations.reserve(tr.history.size());
+    metrics.reserve(tr.history.size());
+    coeffDiffs.reserve(tr.history.size());
+
+
+    double step = 1.0;
+    double log10inv = 1.0 / log(10.0);
     double x = 0.0;
 
     for (const auto& weights: tr.history) {
-        xs.push_back(x);
-        ys.push_back(log(metricsMSE(cases, weights)));
-
+        iterations.push_back(x);
         x += step;
+
+        metrics.push_back(log(metricsMSE(cases, weights)) * log10inv);
+        coeffDiffs.push_back(weights[0] - lastCF);
     }
 
-    using namespace matplot;
+    matplot::plot(iterations, metrics, "-");
+    matplot::save(baseName + "_metrics.svg");
 
-    plot(xs, ys, "-");
-    show();
+    matplot::cla();
+
+    matplot::plot(iterations, coeffDiffs, "-");
+    matplot::save(baseName + "_coefficients.svg");
 }
 
 void checkNetwork(const std::string& baseName) {

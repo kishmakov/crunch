@@ -1,2 +1,5 @@
 *.png
+*.svg
+*.jpg
+*.gif
 cmake-build-debug
