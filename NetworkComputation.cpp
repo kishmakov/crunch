@@ -1,5 +1,5 @@
 #include "NetworkComputation.h"
-#include "activation_functions.h"
+#include "network/activation_functions.h"
 
 const uint64_t NetworkComputation::NEURONS_NUMBER = 5;
 
@@ -16,7 +16,7 @@ NetworkComputation::NetworkComputation(const Case& kase, const Weights& weights)
             x += getInput(weightId) * weights_[weightId];
         }
 
-        actual_[neuronId] = sigmoid(x);
+        actual_[neuronId] = network::sigmoid(x);
     }
 }
 

@@ -1,9 +1,13 @@
+#include <cmath>
+
 #include "activation_functions.h"
 
-#include <math.h>
+namespace network {
 
 double sigmoid(double x) {
     double result;
     result = 1 / (1 + exp(-x));
     return result;
 }
+
+} // network

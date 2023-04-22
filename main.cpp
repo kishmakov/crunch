@@ -35,7 +35,7 @@ void trainNetwork(const std::string& baseName, unsigned randSeed) {
         weightsDistance += log10(metricsL2(history, tr.result));
     }
 
-    Plotter plotter("Convergence on Train Set");
+    Plotter plotter("Convergence on Training Set");
 
     plotter.add("MSE on train set", targetError);
     plotter.add("L_{2} weights", weightsDistance);
