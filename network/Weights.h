@@ -13,14 +13,15 @@ public:
 
     static Weights randomlyChosen(double min, double max);
     static Weights zeroed();
-    explicit Weights(std::string fileName);
+    static Weights loadFromFile(const std::string& baseName);
 
-    friend std::ostream& operator<<(std::ostream& os, const Weights& obj);
     Weights& operator-=(const Weights& correction);
     Weights& operator+=(const Weights& correction);
     Weights& operator*=(double mult);
     double& operator[](unsigned index);
     const double& operator[](unsigned index) const;
+
+    void saveToFile(const std::string& baseName);
 
 private:
     friend class Network;

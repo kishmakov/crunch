@@ -42,14 +42,3 @@ network::Weights correctionMSE(const std::vector<Case>& cases, const network::We
     correction *= 1.0 / double(cases.size());
     return correction;
 }
-
-[[maybe_unused]] inline std::string fullWeightsName(const std::string& base) { return base + ".txt"; }
-
-void saveWeights(const std::string& baseName, const network::Weights& weights) {
-    std::ofstream fout(fullWeightsName(baseName), std::ios::out);
-    fout << weights;
-}
-
-network::Weights loadWeights(const std::string& baseName) {
-    return network::Weights(fullWeightsName(baseName));
-}

@@ -25,7 +25,7 @@ void trainNetwork(const std::string& baseName, unsigned randSeed) {
 
     auto tr = runTraining(cases, weights, REPORTS_NUMBER * STEPS_PER_REPORT, STEPS_PER_REPORT);
 
-    saveWeights(baseName, tr.result);
+    tr.result.saveToFile(baseName);
 
     Plot targetError("-b");
     Plot weightsDistance("-r");
@@ -47,7 +47,7 @@ void trainNetwork(const std::string& baseName, unsigned randSeed) {
 }
 
 void checkNetwork(const std::string& baseName) {
-    network::Weights weights = loadWeights(baseName);
+    auto weights = network::Weights::loadFromFile(baseName);
 
     network::Network network(weights);
 

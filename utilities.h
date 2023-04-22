@@ -10,7 +10,4 @@ double metricsMSE(const std::vector<Case>& cases, const network::Weights& weight
 
 network::Weights correctionMSE(const std::vector<Case>& cases, const network::Weights& weights);
 
-void saveWeights(const std::string& baseName, const network::Weights& weights);
-network::Weights loadWeights(const std::string& baseName);
-
 #endif //CRUNCH_UTILITIES_H
