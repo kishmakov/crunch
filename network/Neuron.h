@@ -6,16 +6,16 @@
 namespace network {
 
 struct Neuron {
-    explicit Neuron(double* weights) : weights_(weights) {}
+    const static uint64_t INPUTS_NUMBER;
 
-    void act(std::vector<double*> inputs);
+    explicit Neuron(const double* weights) : weights_(weights) {}
+
+    void react(const double** inputs);
 
     double value = 0;
-    double delta = 0;
 
 private:
-    std::vector<double*> inputs_;
-    double* weights_;
+    const double* weights_;
 };
 
 

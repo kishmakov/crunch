@@ -1,23 +1,23 @@
 #ifndef CRUNCH_NETWORKCOMPUTATION_H
 #define CRUNCH_NETWORKCOMPUTATION_H
 
-#include "Case.h"
+#include "../Case.h"
 #include "Weights.h"
 
-class NetworkComputation {
-    const static uint64_t NEURONS_NUMBER;
+namespace network {
 
+class NetworkComputation {
 public:
     NetworkComputation(const Case& kase, const Weights& weights);
 
-    [[nodiscard]] double getActual(unsigned id = NEURONS_NUMBER - 1) const;
+    [[nodiscard]] double getActual(unsigned id = 4) const;
     [[nodiscard]] Weights backPropagation() const;
 
 private:
     const Case& case_;
     const Weights& weights_;
 
-    std::vector<double> actual_ = std::vector<double>(NEURONS_NUMBER, 0.0);
+    std::vector<double> actual_ = std::vector<double>(5, 0.0);
 
     [[nodiscard]] inline double getInput(unsigned index) const {
         if (index >= 20) {
@@ -29,5 +29,7 @@ private:
         return index < 4 ? case_.getInput(index) : -1.0;
     }
 };
+
+} // network
 
 #endif //CRUNCH_NETWORKCOMPUTATION_H

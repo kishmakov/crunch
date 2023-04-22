@@ -2,7 +2,7 @@
 #include "utilities.h"
 
 TrainingResult runTraining(const std::vector<Case>& cases,
-                           const Weights& initial,
+                           const network::Weights& initial,
                            uint64_t iterationsNumber,
                            uint64_t snapshotFrequency) {
 

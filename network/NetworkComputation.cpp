@@ -1,12 +1,12 @@
 #include "NetworkComputation.h"
-#include "network/activation_functions.h"
+#include "activation_functions.h"
 
-const uint64_t NetworkComputation::NEURONS_NUMBER = 5;
+namespace network {
 
 NetworkComputation::NetworkComputation(const Case& kase, const Weights& weights) :
         case_(kase),
         weights_(weights) {
-    for (unsigned neuronId = 0; neuronId < NEURONS_NUMBER; ++neuronId) {
+    for (unsigned neuronId = 0; neuronId < 5; ++neuronId) {
         double x = 0;
 
         unsigned lowId = neuronId * 5;
@@ -23,11 +23,11 @@ NetworkComputation::NetworkComputation(const Case& kase, const Weights& weights)
 Weights NetworkComputation::backPropagation() const {
     Weights weightDeltas = Weights::zeroed();
 
-    std::vector<double> actualDeltas = std::vector<double>(NEURONS_NUMBER, 0.0);
+    std::vector<double> actualDeltas = std::vector<double>(5, 0.0);
 
-    actualDeltas[NEURONS_NUMBER - 1] = getActual() - case_.getTarget();
+    actualDeltas[5 - 1] = getActual() - case_.getTarget();
 
-    for (unsigned neuronId = NEURONS_NUMBER; neuronId > 0; ) {
+    for (unsigned neuronId = 5; neuronId > 0; ) {
         --neuronId;
 
         unsigned lowId = neuronId * 5;
@@ -36,7 +36,7 @@ Weights NetworkComputation::backPropagation() const {
         double derivative = actualDeltas[neuronId] * actual * (1 - actual);
 
         for (unsigned linkId = 0; linkId < 5; ++linkId) {
-            if (neuronId + 1 == NEURONS_NUMBER && linkId < 4) {
+            if (neuronId + 1 == 5 && linkId < 4) {
                 actualDeltas[linkId] = derivative * weights_[lowId + linkId];
             }
 
@@ -48,9 +48,11 @@ Weights NetworkComputation::backPropagation() const {
 }
 
 double NetworkComputation::getActual(unsigned id) const {
-    if (id >= NEURONS_NUMBER) {
+    if (id >= 5) {
         throw std::out_of_range("Index out of range");
     }
 
     return actual_[id];
 }
+
+} // network

@@ -3,6 +3,8 @@
 
 #include "Weights.h"
 
+namespace network {
+
 const uint64_t Weights::SIZE = 25;
 
 double randomInRange(double min, double max) {
@@ -83,3 +85,5 @@ Weights::Weights(std::string fileName) : weights_() {
 
     fin.close();
 }
+
+} // network

@@ -2,15 +2,15 @@
 #define CRUNCH_UTILITIES_H
 
 #include "Case.h"
-#include "Weights.h"
+#include "network/Weights.h"
 
-double metricsL2(const Weights& a, const Weights& b, unsigned from = 0, unsigned to = Weights::SIZE);
+double metricsL2(const network::Weights& a, const network::Weights& b, unsigned from = 0, unsigned to = network::Weights::SIZE);
 
-double metricsMSE(const std::vector<Case>& cases, const Weights& weights);
+double metricsMSE(const std::vector<Case>& cases, const network::Weights& weights);
 
-Weights correctionMSE(const std::vector<Case>& cases, const Weights& weights);
+network::Weights correctionMSE(const std::vector<Case>& cases, const network::Weights& weights);
 
-void saveWeights(const std::string& baseName, const Weights& weights);
-Weights loadWeights(const std::string& baseName);
+void saveWeights(const std::string& baseName, const network::Weights& weights);
+network::Weights loadWeights(const std::string& baseName);
 
 #endif //CRUNCH_UTILITIES_H

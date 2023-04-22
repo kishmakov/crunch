@@ -21,6 +21,7 @@ public:
 
     [[nodiscard]] inline double getTarget() const { return target_; }
     [[nodiscard]] double getInput(unsigned number) const;
+    [[nodiscard]] std::vector<double> asInputs() const;
 
 private:
     uint64_t bits_;

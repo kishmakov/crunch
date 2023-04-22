@@ -22,3 +22,13 @@ double Case::getInput(unsigned number) const {
 
     return double((bits_ >> number) & 1);
 }
+
+std::vector<double> Case::asInputs() const {
+    std::vector<double> result(2 * BITNESS, 0.0);
+
+    for (unsigned i = 0; i < 2 * BITNESS; ++i) {
+        result[i] = getInput(i);
+    }
+
+    return result;
+}

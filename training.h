@@ -1,13 +1,13 @@
 #ifndef CRUNCH_TRAINING_H
 #define CRUNCH_TRAINING_H
 
-#include "Weights.h"
+#include "network/Weights.h"
 #include "Case.h"
 
-typedef std::vector<Weights> WeightsHistory;
+typedef std::vector<network::Weights> WeightsHistory;
 
 struct TrainingResult {
-    Weights result;
+    network::Weights result;
     WeightsHistory history;
 
     inline void takeSnapshot() { history.push_back(result); }
@@ -15,7 +15,7 @@ struct TrainingResult {
 
 [[maybe_unused]] TrainingResult runTraining(
         const std::vector<Case>& cases,
-        const Weights& initial,
+        const network::Weights& initial,
         uint64_t iterationsNumber,
         uint64_t snapshotFrequency);
 

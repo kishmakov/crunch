@@ -3,6 +3,8 @@
 
 #include <vector>
 
+namespace network {
+
 class Weights {
     explicit Weights(std::vector<double>&& weights) : weights_(std::move(weights)) {}
 
@@ -21,8 +23,10 @@ public:
     const double& operator[](unsigned index) const;
 
 private:
+    friend class Network;
     std::vector<double> weights_;
 };
 
+} // network
 
 #endif //CRUNCH_WEIGHTS_H

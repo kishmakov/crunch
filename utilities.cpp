@@ -2,10 +2,10 @@
 #include <fstream>
 #include <string>
 
-#include "NetworkComputation.h"
+#include "network/NetworkComputation.h"
 #include "utilities.h"
 
-double metricsL2(const Weights& a, const Weights& b, unsigned int from, unsigned int to) {
+double metricsL2(const network::Weights& a, const network::Weights& b, unsigned int from, unsigned int to) {
     assert(to > from);
 
     double SSE = 0;
@@ -20,22 +20,22 @@ double metricsL2(const Weights& a, const Weights& b, unsigned int from, unsigned
     return std::sqrt(SSE);
 }
 
-double metricsMSE(const std::vector<Case>& cases, const Weights& weights) {
+double metricsMSE(const std::vector<Case>& cases, const network::Weights& weights) {
     double SSE = 0;
 
     for (const auto& kase: cases) {
-        double error = kase.getTarget() - NetworkComputation(kase, weights).getActual();
+        double error = kase.getTarget() - network::NetworkComputation(kase, weights).getActual();
         SSE += error * error;
     }
 
     return SSE / double(cases.size());
 }
 
-Weights correctionMSE(const std::vector<Case>& cases, const Weights& weights) {
-    Weights correction = Weights::zeroed();
+network::Weights correctionMSE(const std::vector<Case>& cases, const network::Weights& weights) {
+    network::Weights correction = network::Weights::zeroed();
 
     for (const auto& kase: cases) {
-        auto computation = NetworkComputation(kase, weights);
+        auto computation = network::NetworkComputation(kase, weights);
         correction += computation.backPropagation();
     }
 
@@ -45,11 +45,11 @@ Weights correctionMSE(const std::vector<Case>& cases, const Weights& weights) {
 
 [[maybe_unused]] inline std::string fullWeightsName(const std::string& base) { return base + ".txt"; }
 
-void saveWeights(const std::string& baseName, const Weights& weights) {
+void saveWeights(const std::string& baseName, const network::Weights& weights) {
     std::ofstream fout(fullWeightsName(baseName), std::ios::out);
     fout << weights;
 }
 
-Weights loadWeights(const std::string& baseName) {
-    return Weights(fullWeightsName(baseName));
+network::Weights loadWeights(const std::string& baseName) {
+    return network::Weights(fullWeightsName(baseName));
 }

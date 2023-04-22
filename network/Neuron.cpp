@@ -3,15 +3,16 @@
 
 namespace network {
 
-void Neuron::act(std::vector<double *> inputs) {
-    inputs_ = std::move(inputs);
+const uint64_t Neuron::INPUTS_NUMBER = 5;
 
+void Neuron::react(const double** inputs) {
     double sum = 0;
 
-    double* weight = weights_;
+    const double* weight = weights_;
+    const double** input = inputs;
 
-    for (double* input: inputs_) {
-        sum += *weight++ * *input;
+    for (unsigned inputId = 0; inputId < INPUTS_NUMBER; ++inputId) {
+        sum += *weight++ * **input++;
     }
 
     value = sigmoid(sum);

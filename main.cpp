@@ -2,11 +2,11 @@
 #include <iostream>
 
 #include "Case.h"
-#include "NetworkComputation.h"
+#include "network/Network.h"
+#include "network/Weights.h"
 #include "Plotter.h"
 #include "training.h"
 #include "utilities.h"
-#include "Weights.h"
 
 static const unsigned RAND_SEED = 20230402;
 static const unsigned REPORTS_NUMBER = 500;
@@ -19,7 +19,7 @@ const std::string MODE_CHECK = "check";
 void trainNetwork(const std::string& baseName, unsigned randSeed) {
     srand(randSeed);
 
-    auto weights = Weights::randomlyChosen(-5.0, 5.0);
+    auto weights = network::Weights::randomlyChosen(-5.0, 5.0);
 
     auto cases = Case::trainingSet();
 
@@ -47,24 +47,27 @@ void trainNetwork(const std::string& baseName, unsigned randSeed) {
 }
 
 void checkNetwork(const std::string& baseName) {
-    Weights weights = loadWeights(baseName);
+    network::Weights weights = loadWeights(baseName);
 
-    auto cases = Case::trainingSet();
+    network::Network network(weights);
 
-    int score = 0;
+    unsigned score = 0;
+    unsigned total = 0;
 
-    for (const auto& kase: cases) {
-        NetworkComputation computation(kase, weights);
-        if (round(kase.getTarget()) == round(computation.getActual())) score++;
+    for (const auto& kase: Case::trainingSet()) {
+        total++;
+
+        double actual = network.react(kase.asInputs());
+        if (round(kase.getTarget()) == round(actual)) score++;
         for (unsigned i = 0; i < 4; ++i) {
             std::cout << i << "=" << kase.getInput(i) << " ";
         }
         std::cout << ": t=" << kase.getTarget();
-        std::cout << " a=" << computation.getActual();
+        std::cout << " a=" << actual;
         std::cout << std::endl;
     }
 
-    std::cout << score << " out of " << cases.size() << std::endl;
+    std::cout << score << " out of " << total << std::endl;
 }
 
 
