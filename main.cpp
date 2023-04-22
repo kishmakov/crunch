@@ -1,18 +1,20 @@
 #include <cmath>
 #include <iostream>
 
-#include <matplot/matplot.h>
-
 #include "Case.h"
 #include "NetworkComputation.h"
+#include "Plotter.h"
 #include "training.h"
 #include "utilities.h"
 #include "Weights.h"
 
-const unsigned RAND_SEED = 20230402;
+static const unsigned RAND_SEED = 20230402;
+static const unsigned REPORTS_NUMBER = 500;
+static const unsigned STEPS_PER_REPORT = 1000;
 
 const std::string MODE_TRAIN = "train";
 const std::string MODE_CHECK = "check";
+
 
 void trainNetwork(const std::string& baseName, unsigned randSeed) {
     srand(randSeed);
@@ -21,40 +23,27 @@ void trainNetwork(const std::string& baseName, unsigned randSeed) {
 
     auto cases = Case::trainingSet();
 
-    auto tr = runTraining(cases, weights, 500000, 1000);
+    auto tr = runTraining(cases, weights, REPORTS_NUMBER * STEPS_PER_REPORT, STEPS_PER_REPORT);
 
     saveWeights(baseName, tr.result);
 
-    std::vector<double> iterations;
-    std::vector<double> metrics;
-    std::vector<double> coeffDiffs;
+    Plot targetError("-b");
+    Plot weightsDistance("-r");
 
-    double lastCF = tr.history.back()[0];
-
-    iterations.reserve(tr.history.size());
-    metrics.reserve(tr.history.size());
-    coeffDiffs.reserve(tr.history.size());
-
-
-    double step = 1.0;
-    double log10inv = 1.0 / log(10.0);
-    double x = 0.0;
-
-    for (const auto& weights: tr.history) {
-        iterations.push_back(x);
-        x += step;
-
-        metrics.push_back(log(metricsMSE(cases, weights)) * log10inv);
-        coeffDiffs.push_back(weights[0] - lastCF);
+    for (const auto& history: tr.history) {
+        targetError += log10(metricsMSE(cases, history));
+        weightsDistance += log10(metricsL2(history, tr.result));
     }
 
-    matplot::plot(iterations, metrics, "-");
-    matplot::save(baseName + "_metrics.svg");
+    Plotter plotter("Convergence on Train Set");
 
-    matplot::cla();
+    plotter.add("MSE on train set", targetError);
+    plotter.add("L_{2} weights", weightsDistance);
 
-    matplot::plot(iterations, coeffDiffs, "-");
-    matplot::save(baseName + "_coefficients.svg");
+    plotter.xlabel = "Iteration / " + std::to_string(STEPS_PER_REPORT);
+    plotter.ylabel = "log_{10}";
+
+    plotter.draw(baseName + "_mse_error");
 }
 
 void checkNetwork(const std::string& baseName) {

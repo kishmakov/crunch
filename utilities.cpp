@@ -1,9 +1,24 @@
+#include <cmath>
 #include <fstream>
 #include <string>
 
 #include "NetworkComputation.h"
 #include "utilities.h"
 
+double metricsL2(const Weights& a, const Weights& b, unsigned int from, unsigned int to) {
+    assert(to > from);
+
+    double SSE = 0;
+
+    for (unsigned i = from; i < to; ++i) {
+        double diff = a[i] - b[i];
+        SSE += diff * diff;
+    }
+
+    SSE /= to - from;
+
+    return std::sqrt(SSE);
+}
 
 double metricsMSE(const std::vector<Case>& cases, const Weights& weights) {
     double SSE = 0;
@@ -38,4 +53,3 @@ void saveWeights(const std::string& baseName, const Weights& weights) {
 Weights loadWeights(const std::string& baseName) {
     return Weights(fullWeightsName(baseName));
 }
-
