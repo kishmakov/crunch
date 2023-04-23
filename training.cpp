@@ -11,8 +11,6 @@ TrainingResult runTraining(const std::vector<Case>& cases,
 
     for (unsigned iteration = 0; iteration < iterationsNumber; ++iteration) {
         if (iteration % snapshotFrequency == 0) tr.takeSnapshot();
-
-        metricsMSE(cases, tr.result);
         tr.result -= correctionMSE(cases, tr.result);
     }
 

@@ -21,7 +21,8 @@ void plotWeightsAndMSE(const std::string& baseName, const std::vector<Case>& cas
     Plot weightsDistance("-r");
 
     for (const auto& history: tr.history) {
-        targetError += log10(metricsMSE(cases, history));
+        network::Network net(history);
+        targetError += log10(metricsMSE(cases, net));
         weightsDistance += log10(metricsL2(history, tr.result));
     }
 

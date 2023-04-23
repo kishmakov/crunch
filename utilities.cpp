@@ -1,7 +1,7 @@
 #include <cmath>
 
-#include "network/NetworkComputation.h"
 #include "utilities.h"
+#include "network/Network.h"
 
 double metricsL2(const network::Weights& a, const network::Weights& b, unsigned int from, unsigned int to) {
     assert(to > from);
@@ -33,11 +33,11 @@ double metricsL2(const std::vector<double>& a, const std::vector<double>& b) {
     return std::sqrt(SSE);
 }
 
-double metricsMSE(const std::vector<Case>& cases, const network::Weights& weights) {
+double metricsMSE(const std::vector<Case>& cases, network::Network& net) {
     double SSE = 0;
 
     for (const auto& kase: cases) {
-        double error = kase.getTarget() - network::NetworkComputation(kase, weights).getActual();
+        double error = kase.getTarget() - net.react(kase.asInputs());
         SSE += error * error;
     }
 
@@ -45,13 +45,17 @@ double metricsMSE(const std::vector<Case>& cases, const network::Weights& weight
 }
 
 network::Weights correctionMSE(const std::vector<Case>& cases, const network::Weights& weights) {
-    network::Weights correction = network::Weights::zeroed();
+    network::Weights correctionN = network::Weights::zeroed();
 
     for (const auto& kase: cases) {
-        auto computation = network::NetworkComputation(kase, weights);
-        correction += computation.backPropagation();
+        network::Network net(weights);
+        auto inputs = kase.asInputs();
+        double actual = net.react(inputs);
+        auto newC = net.backPropagation(actual - kase.getTarget(), inputs);
+        correctionN += newC;
     }
 
-    correction *= 1.0 / double(cases.size());
-    return correction;
+    correctionN *= 1.0 / double(cases.size());
+
+    return correctionN;
 }
