@@ -10,6 +10,8 @@ struct Neuron {
 
     explicit Neuron(const double* weights) : weights_(weights) {}
 
+    std::vector<double> getWeights() const;
+
     void react(const double** inputs);
 
     double value = 0;

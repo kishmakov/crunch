@@ -2,7 +2,7 @@
 
 namespace network {
 
-const uint64_t Network::NEURONS_NUMBER = 5;
+const size_t Network::NEURONS_NUMBER = 5;
 const double Network::BIAS_INPUT = -1.0;
 
 
@@ -33,6 +33,14 @@ double Network::react(const std::vector<double>& inputs) {
     neurons_[NEURONS_NUMBER - 1].react(&inputsPtrs_[Neuron::INPUTS_NUMBER]);
 
     return neurons_[NEURONS_NUMBER - 1].value;
+}
+
+const Neuron& Network::getNeuron(size_t index) {
+    if (index >= NEURONS_NUMBER) {
+        throw std::out_of_range("Index out of range");
+    }
+
+    return neurons_[index];
 }
 
 } // network

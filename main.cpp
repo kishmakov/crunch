@@ -16,17 +16,7 @@ const std::string MODE_TRAIN = "train";
 const std::string MODE_CHECK = "check";
 
 
-void trainNetwork(const std::string& baseName, unsigned randSeed) {
-    srand(randSeed);
-
-    auto weights = network::Weights::randomlyChosen(-5.0, 5.0);
-
-    auto cases = Case::trainingSet();
-
-    auto tr = runTraining(cases, weights, REPORTS_NUMBER * STEPS_PER_REPORT, STEPS_PER_REPORT);
-
-    tr.result.saveToFile(baseName);
-
+void plotWeightsAndMSE(const std::string& baseName, const std::vector<Case>& cases, TrainingResult& tr) {
     Plot targetError("-b");
     Plot weightsDistance("-r");
 
@@ -44,6 +34,55 @@ void trainNetwork(const std::string& baseName, unsigned randSeed) {
     plotter.ylabel = "log_{10}";
 
     plotter.draw(baseName + "_mse_error");
+}
+
+// https://github.com/alandefreitas/matplotplusplus/blob/8dbea7d359f7b4f456bca7a6015c32b61ad728f4/source/matplot/util/colors.cpp
+void plotNeurons(const std::string& baseName, TrainingResult& tr) {
+    std::vector<Plot> plots = {
+            Plot("-b"),
+            Plot("-k"),
+            Plot("-c"),
+            Plot("-g"),
+            Plot("-r")
+    };
+
+    network::Network resulting(tr.result);
+
+    for (const auto& history: tr.history) {
+        network::Network historic(history);
+
+        for (size_t id = 0; id < network::Network::NEURONS_NUMBER; ++id) {
+            auto hist = historic.getNeuron(id).getWeights();
+            auto res = resulting.getNeuron(id).getWeights();
+            plots[id] += log10(metricsL2(hist, res));
+        }
+    }
+
+    Plotter plotter("Neurons on Training Set");
+
+    for (size_t id = 0; id < network::Network::NEURONS_NUMBER; ++id) {
+        plotter.add("Neuron #" + std::to_string(id), plots[id]);
+    }
+
+    plotter.xlabel = "Iteration / " + std::to_string(STEPS_PER_REPORT);
+    plotter.ylabel = "log_{10} of L_{2}";
+
+    plotter.draw(baseName + "_neurons");
+}
+
+void trainNetwork(const std::string& baseName, unsigned randSeed) {
+    srand(randSeed);
+
+    auto weights = network::Weights::randomlyChosen(-5.0, 5.0);
+
+    auto cases = Case::trainingSet();
+
+    auto tr = runTraining(cases, weights, REPORTS_NUMBER * STEPS_PER_REPORT, STEPS_PER_REPORT);
+
+    tr.result.saveToFile(baseName);
+
+    plotWeightsAndMSE(baseName, cases, tr);
+    plotNeurons(baseName, tr);
 }
 
 void checkNetwork(const std::string& baseName) {

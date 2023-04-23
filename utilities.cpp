@@ -1,6 +1,4 @@
 #include <cmath>
-#include <fstream>
-#include <string>
 
 #include "network/NetworkComputation.h"
 #include "utilities.h"
@@ -16,6 +14,21 @@ double metricsL2(const network::Weights& a, const network::Weights& b, unsigned 
     }
 
     SSE /= to - from;
+
+    return std::sqrt(SSE);
+}
+
+double metricsL2(const std::vector<double>& a, const std::vector<double>& b) {
+    assert(a.size() == b.size());
+
+    double SSE = 0;
+
+    for (size_t i = 0; i < a.size(); ++i) {
+        double diff = a[i] - b[i];
+        SSE += diff * diff;
+    }
+
+    SSE /= a.size();
 
     return std::sqrt(SSE);
 }

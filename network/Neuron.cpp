@@ -18,4 +18,15 @@ void Neuron::react(const double** inputs) {
     value = sigmoid(sum);
 }
 
+std::vector<double> Neuron::getWeights() const {
+    std::vector<double> result;
+    result.reserve(INPUTS_NUMBER);
+
+    for (size_t id = 0; id < INPUTS_NUMBER; ++id) {
+        result.push_back(weights_[id]);
+    }
+
+    return result;
+}
+
 } // network

@@ -10,8 +10,11 @@ struct Network {
     explicit Network(const Weights& weights);
     double react(const std::vector<double>& inputs);
 
+    const static size_t NEURONS_NUMBER;
+
+    const Neuron& getNeuron(size_t index);
+
 private:
-    const static uint64_t NEURONS_NUMBER;
     const static double BIAS_INPUT;
 
     const Weights& weights_;
