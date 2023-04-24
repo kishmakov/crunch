@@ -1,37 +1,6 @@
-#include <cmath>
-
 #include "utilities.h"
 #include "network/Network.h"
 
-double metricsL2(const network::Weights& a, const network::Weights& b, unsigned int from, unsigned int to) {
-    assert(to > from);
-
-    double SSE = 0;
-
-    for (unsigned i = from; i < to; ++i) {
-        double diff = a[i] - b[i];
-        SSE += diff * diff;
-    }
-
-    SSE /= to - from;
-
-    return std::sqrt(SSE);
-}
-
-double metricsL2(const std::vector<double>& a, const std::vector<double>& b) {
-    assert(a.size() == b.size());
-
-    double SSE = 0;
-
-    for (size_t i = 0; i < a.size(); ++i) {
-        double diff = a[i] - b[i];
-        SSE += diff * diff;
-    }
-
-    SSE /= a.size();
-
-    return std::sqrt(SSE);
-}
 
 double metricsMSE(const std::vector<Case>& cases, network::Network& net) {
     double SSE = 0;

@@ -20,6 +20,7 @@ public:
     Weights& operator*=(double mult);
     double& operator[](unsigned index);
     const double& operator[](unsigned index) const;
+    double distanceL2(const Weights& correction) const;
 
     void saveToFile(const std::string& baseName);
 

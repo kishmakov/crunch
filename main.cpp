@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "Case.h"
+#include "math/metrics.h"
 #include "network/Network.h"
 #include "network/Weights.h"
 #include "Plotter.h"
@@ -23,7 +24,7 @@ void plotWeightsAndMSE(const std::string& baseName, const std::vector<Case>& cas
     for (const auto& history: tr.history) {
         network::Network net(history);
         targetError += log10(metricsMSE(cases, net));
-        weightsDistance += log10(metricsL2(history, tr.result));
+        weightsDistance += log10(tr.result.distanceL2(history));
     }
 
     Plotter plotter("Convergence on Training Set");
@@ -55,7 +56,7 @@ void plotNeurons(const std::string& baseName, TrainingResult& tr) {
         for (size_t id = 0; id < network::Network::NEURONS_NUMBER; ++id) {
             auto hist = historic.getNeuron(id).getWeights();
             auto res = resulting.getNeuron(id).getWeights();
-            plots[id] += log10(metricsL2(hist, res));
+            plots[id] += log10(math::metricsL2(hist, res));
         }
     }
 

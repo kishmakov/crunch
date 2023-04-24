@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iomanip>
 
+#include "math/metrics.h"
 #include "Weights.h"
 
 namespace network {
@@ -81,6 +82,10 @@ const double& Weights::operator[](unsigned index) const {
     }
 
     return weights_[index];
+}
+
+double Weights::distanceL2(const Weights& correction) const {
+    return math::metricsL2(weights_, correction.weights_);
 }
 
 void Weights::saveToFile(const std::string& baseName) {
