@@ -13,11 +13,12 @@ double metricsMSE(const std::vector<Case>& cases, network::Network& net) {
     return SSE / double(cases.size());
 }
 
-network::Weights correctionMSE(const std::vector<Case>& cases, const network::Weights& weights) {
+network::Weights
+correctionMSE(const std::vector<Case>& cases, const network::Weights& weights, const std::string& activationFunction) {
     network::Weights correctionN = network::Weights::zeroed();
 
     for (const auto& kase: cases) {
-        network::Network net(weights);
+        network::Network net(weights,activationFunction);
         auto inputs = kase.asInputs();
         double actual = net.react(inputs);
         auto newC = net.backPropagation(actual - kase.getTarget(), inputs);

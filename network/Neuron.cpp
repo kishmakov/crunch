@@ -1,4 +1,4 @@
-#include "activation_functions.h"
+#include "math/activation_functions.h"
 #include "Neuron.h"
 
 namespace network {
@@ -26,8 +26,8 @@ void Neuron::react(const double** inputs) {
         sum += *weight++ * **input++;
     }
 
-    value = sigmoid(sum);
-    derivative = value * (1 - value);
+    value = af_.function(sum);
+    derivative = af_.derivative(sum);
 }
 
 std::vector<double> Neuron::backPropagationWeights(double delta, const double* const* inputs) const {

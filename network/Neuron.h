@@ -3,12 +3,14 @@
 
 #include <vector>
 
+#include "math/activation_functions.h"
+
 namespace network {
 
 struct Neuron {
     const static size_t INPUTS_NUMBER;
 
-    explicit Neuron(const double* weights) : weights_(weights) {}
+    explicit Neuron(const double* weights, const math::ActivationFunction& af) : weights_(weights), af_(af) {}
 
     [[nodiscard]] std::vector<double> getWeights() const;
 
@@ -24,8 +26,8 @@ struct Neuron {
 private:
     double derivative = 0;
     const double* weights_;
+    const math::ActivationFunction& af_;
 };
-
 
 } // network
 

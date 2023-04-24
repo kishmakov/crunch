@@ -22,7 +22,7 @@ void plotWeightsAndMSE(const std::string& baseName, const std::vector<Case>& cas
     Plot weightsDistance("-r");
 
     for (const auto& history: tr.history) {
-        network::Network net(history);
+        network::Network net(history, tr.functionName);
         targetError += log10(metricsMSE(cases, net));
         weightsDistance += log10(tr.result.distanceL2(history));
     }
@@ -48,10 +48,10 @@ void plotNeurons(const std::string& baseName, TrainingResult& tr) {
             Plot("-r")
     };
 
-    network::Network resulting(tr.result);
+    network::Network resulting(tr.result, tr.functionName);
 
     for (const auto& history: tr.history) {
-        network::Network historic(history);
+        network::Network historic(history, tr.functionName);
 
         for (size_t id = 0; id < network::Network::NEURONS_NUMBER; ++id) {
             auto hist = historic.getNeuron(id).getWeights();
@@ -72,25 +72,25 @@ void plotNeurons(const std::string& baseName, TrainingResult& tr) {
     plotter.draw(baseName + "_neurons");
 }
 
-void trainNetwork(const std::string& baseName, unsigned randSeed) {
+void trainNetwork(const std::string& functionName, unsigned randSeed) {
     srand(randSeed);
 
     auto weights = network::Weights::randomlyChosen(-5.0, 5.0);
 
     auto cases = Case::trainingSet();
 
-    auto tr = runTraining(cases, weights, REPORTS_NUMBER * STEPS_PER_REPORT, STEPS_PER_REPORT);
+    auto tr = runTraining(cases, weights, REPORTS_NUMBER * STEPS_PER_REPORT, STEPS_PER_REPORT, functionName);
 
-    tr.result.saveToFile(baseName);
+    tr.result.saveToFile(functionName);
 
-    plotWeightsAndMSE(baseName, cases, tr);
-    plotNeurons(baseName, tr);
+    plotWeightsAndMSE(functionName, cases, tr);
+    plotNeurons(functionName, tr);
 }
 
-void checkNetwork(const std::string& baseName) {
-    auto weights = network::Weights::loadFromFile(baseName);
+void checkNetwork(const std::string& functionName) {
+    auto weights = network::Weights::loadFromFile(functionName);
 
-    network::Network network(weights);
+    network::Network network(weights, functionName);
 
     unsigned score = 0;
     unsigned total = 0;
@@ -120,14 +120,14 @@ int main(int argc, char* argv[]) {
     }
 
     std::string mode(argv[1]);
-    std::string fileName(argv[2]);
+    std::string activationFunction(argv[2]);
 
     if (mode == MODE_TRAIN) {
-        trainNetwork(fileName, RAND_SEED);
+        trainNetwork(activationFunction, RAND_SEED);
     }
 
     if (mode == MODE_CHECK) {
-        checkNetwork(fileName);
+        checkNetwork(activationFunction);
     }
 
     return 0;

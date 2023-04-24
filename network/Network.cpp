@@ -1,4 +1,5 @@
 #include "Network.h"
+#include "math/activation_functions.h"
 
 namespace network {
 
@@ -6,11 +7,13 @@ const size_t Network::NEURONS_NUMBER = 5;
 const double Network::BIAS_INPUT = -1.0;
 
 
-Network::Network(const Weights& weights) : weights_(weights) {
+Network::Network(const Weights& weights, const std::string& functionName) : weights_(weights) {
     neurons_.reserve(NEURONS_NUMBER);
 
+    const auto& af = math::activationByName(functionName);
+
     for (unsigned neuronId = 0; neuronId < NEURONS_NUMBER; ++neuronId) {
-        neurons_.emplace_back(&weights_.weights_[neuronId * Neuron::INPUTS_NUMBER]);
+        neurons_.emplace_back(&weights_.weights_[neuronId * Neuron::INPUTS_NUMBER], af);
     }
 }
 

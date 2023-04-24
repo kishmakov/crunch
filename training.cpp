@@ -4,14 +4,16 @@
 TrainingResult runTraining(const std::vector<Case>& cases,
                            const network::Weights& initial,
                            uint64_t iterationsNumber,
-                           uint64_t snapshotFrequency) {
+                           uint64_t snapshotFrequency,
+                           const std::string& functionName) {
 
-    TrainingResult tr = {initial };
+    TrainingResult tr = {initial};
+    tr.functionName = functionName;
     tr.history.reserve((iterationsNumber + 1) / snapshotFrequency);
 
     for (unsigned iteration = 0; iteration < iterationsNumber; ++iteration) {
         if (iteration % snapshotFrequency == 0) tr.takeSnapshot();
-        tr.result -= correctionMSE(cases, tr.result);
+        tr.result -= correctionMSE(cases, tr.result, functionName);
     }
 
     return std::move(tr);

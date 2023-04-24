@@ -3,13 +3,14 @@
 
 #include "Neuron.h"
 #include "Weights.h"
+#include "math/activation_functions.h"
 
 namespace network {
 
 struct Network {
     const static size_t NEURONS_NUMBER;
 
-    explicit Network(const Weights& weights);
+    explicit Network(const Weights& weights, const std::string& functionName);
 
     [[nodiscard]]
     const Neuron& getNeuron(size_t index) const;
