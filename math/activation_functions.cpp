@@ -17,8 +17,17 @@ static double sigmoidDerivative(double x) {
     return ex / (denom * denom);
 }
 
+static double reluFunciton(double x) {
+    return x < 0.0 ? 0.0 : x;
+}
+
+static double reluDerivative(double x) {
+    return x < 0.0 ? 0.0 : 1.0;
+}
+
 static std::map<std::string, ActivationFunction> TaggedActivationFunctions = {
-        {"sigmoid", {&sigmoidFunciton, &sigmoidDerivative}}
+        {"sigmoid", {&sigmoidFunciton, &sigmoidDerivative}},
+        {"relu", {&reluFunciton, &reluDerivative}}
 };
 
 const ActivationFunction& activationByName(const std::string& name) {
