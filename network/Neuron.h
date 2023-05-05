@@ -10,10 +10,11 @@ namespace network {
 struct Neuron {
     const static size_t INPUTS_NUMBER;
 
-    explicit Neuron(const double* weights, const math::ActivationFunction& af) : weights_(weights), af_(af) {}
+    Neuron(double *weights, const std::string& funcName);
 
     [[nodiscard]] std::vector<double> getWeights() const;
 
+    void init();
     void react(const double** inputs);
 
     [[nodiscard]]
@@ -25,7 +26,7 @@ struct Neuron {
 
 private:
     double derivative = 0;
-    const double* weights_;
+    double* weights_;
     const math::ActivationFunction& af_;
 };
 

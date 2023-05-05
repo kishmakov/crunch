@@ -2,27 +2,25 @@
 #include <iomanip>
 
 #include "math/metrics.h"
+#include "Neuron.h"
 #include "Weights.h"
 
 namespace network {
 
-const uint64_t Weights::SIZE = 25;
+const size_t Weights::SIZE = 25;
 
-double randomInRange(double min, double max) {
-    return min + ((max - min) * rand()) / (RAND_MAX);
-}
 
 [[maybe_unused]] inline std::string fullWeightsName(const std::string& base) { return base + ".txt"; }
 
-Weights Weights::randomlyChosen(double min, double max) {
-    std::vector<double> weights(SIZE, 0.0);
-
-    for (unsigned i = 0; i < SIZE; ++i) {
-        weights[i] = randomInRange(min, max);
-    }
-
-    return Weights(std::move(weights));
-}
+//Weights Weights::randomlyChosen(double min, double max) {
+//    std::vector<double> weights(SIZE, 0.0);
+//
+//    for (size_t i = 0; i < SIZE; ++i) {
+//        weights[i] = randomInRange(min, max);
+//    }
+//
+//    return Weights(std::move(weights));
+//}
 
 Weights Weights::zeroed() {
     std::vector<double> weights(SIZE, 0.0);
@@ -45,7 +43,7 @@ Weights Weights::loadFromFile(const std::string& baseName) {
 }
 
 Weights& Weights::operator-=(const Weights& correction) {
-    for (unsigned i = 0; i < SIZE; i++) {
+    for (size_t i = 0; i < SIZE; i++) {
         weights_[i] -= correction.weights_[i];
     }
 
@@ -53,7 +51,7 @@ Weights& Weights::operator-=(const Weights& correction) {
 }
 
 Weights& Weights::operator+=(const Weights& correction) {
-    for (unsigned i = 0; i < SIZE; i++) {
+    for (size_t i = 0; i < SIZE; i++) {
         weights_[i] += correction.weights_[i];
     }
 
@@ -68,7 +66,7 @@ Weights& Weights::operator*=(double mult) {
     return *this;
 }
 
-double& Weights::operator[](unsigned index) {
+double& Weights::operator[](size_t index) {
     if (index >= SIZE) {
         throw std::out_of_range("Index out of range");
     }
@@ -76,13 +74,18 @@ double& Weights::operator[](unsigned index) {
     return weights_[index];
 }
 
-const double& Weights::operator[](unsigned index) const {
+const double& Weights::operator[](size_t index) const {
     if (index >= SIZE) {
         throw std::out_of_range("Index out of range");
     }
 
     return weights_[index];
 }
+
+double* Weights::startForNeuron(size_t index) {
+    return &weights_[index * Neuron::INPUTS_NUMBER];
+}
+
 
 double Weights::distanceL2(const Weights& correction) const {
     return math::metricsL2(weights_, correction.weights_);

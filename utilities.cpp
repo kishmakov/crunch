@@ -1,5 +1,6 @@
 #include "utilities.h"
 #include "network/Network.h"
+#include "network/Weights.h"
 
 
 double metricsMSE(const std::vector<Case>& cases, network::Network& net) {
@@ -13,19 +14,17 @@ double metricsMSE(const std::vector<Case>& cases, network::Network& net) {
     return SSE / double(cases.size());
 }
 
-network::Weights
-correctionMSE(const std::vector<Case>& cases, const network::Weights& weights, const std::string& activationFunction) {
+
+void correctionMSE(const std::vector<Case>& cases, network::Network& net, const std::string& packName) {
     network::Weights correctionN = network::Weights::zeroed();
 
     for (const auto& kase: cases) {
-        network::Network net(weights,activationFunction);
         auto inputs = kase.asInputs();
         double actual = net.react(inputs);
         auto newC = net.backPropagation(actual - kase.getTarget(), inputs);
         correctionN += newC;
     }
 
-    correctionN *= 1.0 / double(cases.size());
-
-    return correctionN;
+    correctionN *= -1.0 / double(cases.size());
+    net += correctionN;
 }

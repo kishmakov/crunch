@@ -9,17 +9,18 @@ class Weights {
     explicit Weights(std::vector<double>&& weights) : weights_(std::move(weights)) {}
 
 public:
-    const static uint64_t SIZE;
+    const static size_t SIZE;
 
-    static Weights randomlyChosen(double min, double max);
     static Weights zeroed();
     static Weights loadFromFile(const std::string& baseName);
 
     Weights& operator-=(const Weights& correction);
     Weights& operator+=(const Weights& correction);
     Weights& operator*=(double mult);
-    double& operator[](unsigned index);
-    const double& operator[](unsigned index) const;
+    double& operator[](size_t index);
+    const double& operator[](size_t index) const;
+
+    double* startForNeuron(size_t index);
     double distanceL2(const Weights& correction) const;
 
     void saveToFile(const std::string& baseName);

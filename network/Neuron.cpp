@@ -1,9 +1,13 @@
-#include "math/activation_functions.h"
 #include "Neuron.h"
 
 namespace network {
 
 const size_t Neuron::INPUTS_NUMBER = 5;
+
+Neuron::Neuron(double *weights, const std::string& funcName) :
+    weights_(weights),
+    af_(math::activationByName(funcName))
+{}
 
 std::vector<double> Neuron::getWeights() const {
     std::vector<double> result;
@@ -14,6 +18,13 @@ std::vector<double> Neuron::getWeights() const {
     }
 
     return result;
+}
+
+void Neuron::init() {
+    double* weight = weights_;
+    for (size_t inputId = 0; inputId < INPUTS_NUMBER; ++inputId) {
+        *weight++ = af_.init(inputId);
+    }
 }
 
 void Neuron::react(const double** inputs) {

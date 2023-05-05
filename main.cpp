@@ -22,7 +22,7 @@ void plotWeightsAndMSE(const std::string& baseName, const std::vector<Case>& cas
     Plot weightsDistance("-r");
 
     for (const auto& history: tr.history) {
-        network::Network net(history, tr.functionName);
+        network::Network net(history, tr.packName);
         targetError += log10(metricsMSE(cases, net));
         weightsDistance += log10(tr.result.distanceL2(history));
     }
@@ -48,10 +48,10 @@ void plotNeurons(const std::string& baseName, TrainingResult& tr) {
             Plot("-r")
     };
 
-    network::Network resulting(tr.result, tr.functionName);
+    network::Network resulting(tr.result, tr.packName);
 
     for (const auto& history: tr.history) {
-        network::Network historic(history, tr.functionName);
+        network::Network historic(history, tr.packName);
 
         for (size_t id = 0; id < network::Network::NEURONS_NUMBER; ++id) {
             auto hist = historic.getNeuron(id).getWeights();
@@ -72,19 +72,15 @@ void plotNeurons(const std::string& baseName, TrainingResult& tr) {
     plotter.draw(baseName + "_neurons");
 }
 
-void trainNetwork(const std::string& functionName, unsigned randSeed) {
-    srand(randSeed);
-
-    auto weights = network::Weights::randomlyChosen(-5.0, 5.0);
-
+void trainNetwork(const std::string& neuronPack) {
     auto cases = Case::trainingSet();
 
-    auto tr = runTraining(cases, weights, REPORTS_NUMBER * STEPS_PER_REPORT, STEPS_PER_REPORT, functionName);
+    auto tr = runTraining(cases, REPORTS_NUMBER * STEPS_PER_REPORT, STEPS_PER_REPORT, neuronPack);
 
-    tr.result.saveToFile(functionName);
+    tr.result.saveToFile(neuronPack);
 
-    plotWeightsAndMSE(functionName, cases, tr);
-    plotNeurons(functionName, tr);
+    plotWeightsAndMSE(neuronPack, cases, tr);
+    plotNeurons(neuronPack, tr);
 }
 
 void checkNetwork(const std::string& functionName) {
@@ -119,11 +115,13 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    srand(RAND_SEED);
+
     std::string mode(argv[1]);
     std::string activationFunction(argv[2]);
 
     if (mode == MODE_TRAIN) {
-        trainNetwork(activationFunction, RAND_SEED);
+        trainNetwork(activationFunction);
     }
 
     if (mode == MODE_CHECK) {
