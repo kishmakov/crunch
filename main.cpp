@@ -97,7 +97,7 @@ void checkNetwork(const std::string& functionName) {
         double actual = network.react(kase.asInputs());
         if (round(kase.getTarget()) == round(actual)) score++;
         for (unsigned i = 0; i < 4; ++i) {
-            std::cout << i << "=" << kase.getInput(i) << " ";
+            std::cout << kase.getInput(i) << " ";
         }
         std::cout << ": t=" << kase.getTarget();
         std::cout << " a=" << actual;
