@@ -5,6 +5,28 @@ set(CMAKE_CXX_STANDARD 20)
 
 include_directories(/opt/homebrew/Cellar/matplotplusplus/1.1.0_3/include .)
 
-add_executable(crunch main.cpp wallace.cpp wallace.h math/activation_functions.cpp math/activation_functions.h utilities.cpp utilities.h Case.cpp Case.h network/Weights.cpp network/Weights.h training.cpp training.h Plotter.cpp Plotter.h network/Neuron.cpp network/Neuron.h network/Network.cpp network/Network.h math/metrics.cpp math/metrics.h)
+add_executable(crunch
+        main.cpp
+        wallace.cpp
+        wallace.h
+        utilities.cpp
+        utilities.h
+        Case.cpp
+        Case.h
+        Plotter.cpp
+        Plotter.h
+        math/activation_functions.cpp
+        math/activation_functions.h
+        math/metrics.cpp
+        math/metrics.h
+        network/Training.cpp
+        network/Training.h
+        network/Neuron.cpp
+        network/Neuron.h
+        network/Network.cpp
+        network/Network.h
+        network/Weights.cpp
+        network/Weights.h
+)
 
 target_link_libraries(crunch /opt/homebrew/Cellar/matplotplusplus/1.1.0_3/lib/libmatplot.dylib)

@@ -1,5 +1,7 @@
-#include "training.h"
+#include "network/Training.h"
 #include "utilities.h"
+
+namespace network {
 
 const size_t CANDIDATES_NUMBER = 16;
 
@@ -39,3 +41,5 @@ TrainingResult runTraining(const std::vector<Case>& cases,
 
     return std::move(tr);
 }
+
+} // network

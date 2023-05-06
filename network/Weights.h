@@ -23,7 +23,7 @@ public:
     double* startForNeuron(size_t index);
     double distanceL2(const Weights& correction) const;
 
-    void saveToFile(const std::string& baseName);
+    void saveToFile(const std::string& scheme);
 
 private:
     friend class Network;

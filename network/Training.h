@@ -7,6 +7,8 @@
 #include "network/Network.h"
 #include "network/Weights.h"
 
+namespace network {
+
 typedef std::vector<network::Weights> WeightsHistory;
 
 struct TrainingResult {
@@ -14,7 +16,7 @@ struct TrainingResult {
     WeightsHistory history;
     std::string packName;
 
-    inline void takeSnapshot(const network::Network& net) { history.push_back(net.getWeights()); }
+    inline void takeSnapshot(const Network& net) { history.push_back(net.getWeights()); }
 };
 
 [[maybe_unused]] TrainingResult
@@ -22,5 +24,7 @@ runTraining(const std::vector<Case>& cases,
             uint64_t iterationsNumber,
             uint64_t snapshotFrequency,
             const std::string& packName);
+
+} // network
 
 #endif //CRUNCH_TRAINING_H

@@ -6,7 +6,7 @@
 #include "network/Network.h"
 #include "network/Weights.h"
 #include "Plotter.h"
-#include "training.h"
+#include "network/Training.h"
 #include "utilities.h"
 
 static const unsigned RAND_SEED = 20230402;
@@ -17,7 +17,7 @@ const std::string MODE_TRAIN = "train";
 const std::string MODE_CHECK = "check";
 
 
-void plotWeightsAndMSE(const std::string& baseName, const std::vector<Case>& cases, TrainingResult& tr) {
+void plotWeightsAndMSE(const std::string& baseName, const std::vector<Case>& cases, network::TrainingResult& tr) {
     Plot targetError("-b");
     Plot weightsDistance("-r");
 
@@ -39,7 +39,7 @@ void plotWeightsAndMSE(const std::string& baseName, const std::vector<Case>& cas
 }
 
 // https://github.com/alandefreitas/matplotplusplus/blob/8dbea7d359f7b4f456bca7a6015c32b61ad728f4/source/matplot/util/colors.cpp
-void plotNeurons(const std::string& baseName, TrainingResult& tr) {
+void plotNeurons(const std::string& baseName, network::TrainingResult& tr) {
     std::vector<Plot> plots = {
             Plot("-b"),
             Plot("-k"),
@@ -72,15 +72,15 @@ void plotNeurons(const std::string& baseName, TrainingResult& tr) {
     plotter.draw(baseName + "_neurons");
 }
 
-void trainNetwork(const std::string& neuronPack) {
+void trainNetwork(const std::string& scheme) {
     auto cases = Case::trainingSet();
 
-    auto tr = runTraining(cases, REPORTS_NUMBER * STEPS_PER_REPORT, STEPS_PER_REPORT, neuronPack);
+    auto tr = network::runTraining(cases, REPORTS_NUMBER * STEPS_PER_REPORT, STEPS_PER_REPORT, scheme);
 
-    tr.result.saveToFile(neuronPack);
+    tr.result.saveToFile(scheme);
 
-    plotWeightsAndMSE(neuronPack, cases, tr);
-    plotNeurons(neuronPack, tr);
+    plotWeightsAndMSE(scheme, cases, tr);
+    plotNeurons(scheme, tr);
 }
 
 void checkNetwork(const std::string& functionName) {
@@ -118,14 +118,14 @@ int main(int argc, char* argv[]) {
     srand(RAND_SEED);
 
     std::string mode(argv[1]);
-    std::string activationFunction(argv[2]);
+    std::string scheme(argv[2]);
 
     if (mode == MODE_TRAIN) {
-        trainNetwork(activationFunction);
+        trainNetwork(scheme);
     }
 
     if (mode == MODE_CHECK) {
-        checkNetwork(activationFunction);
+        checkNetwork(scheme);
     }
 
     return 0;

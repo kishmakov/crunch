@@ -9,7 +9,7 @@ namespace network {
 
 const size_t Weights::SIZE = 25;
 
-[[maybe_unused]] inline std::string fullWeightsName(const std::string& base) { return base + ".txt"; }
+[[maybe_unused]] inline std::string fullWeightsName(const std::string& scheme) { return "results/" + scheme + ".txt"; }
 
 Weights Weights::zeroed() {
     std::vector<double> weights(SIZE, 0.0);
@@ -80,8 +80,8 @@ double Weights::distanceL2(const Weights& correction) const {
     return math::metricsL2(weights_, correction.weights_);
 }
 
-void Weights::saveToFile(const std::string& baseName) {
-    std::ofstream fout(fullWeightsName(baseName), std::ios::out);
+void Weights::saveToFile(const std::string& scheme) {
+    std::ofstream fout(fullWeightsName(scheme), std::ios::out);
 
     for (const auto& w: weights_) {
         fout << std::setprecision(9) << w << std::endl;
