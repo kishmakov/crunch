@@ -5,28 +5,17 @@
 namespace network {
 
 const size_t Network::NEURONS_NUMBER = 5;
-const double Network::BIAS_INPUT = -1.0;
+const double Network::BIAS_INPUT = 1.0;
 
-
-Network::Network(const std::string& packName) : weights_(Weights::zeroed()) {
+Network::Network(const std::string& packName, Weights weights) : weights_(std::move(weights)) {
     neurons_.reserve(NEURONS_NUMBER);
 
     const auto& pack = math::packByName(packName);
 
-    for (unsigned neuronId = 0; neuronId < NEURONS_NUMBER; ++neuronId) {
-        neurons_.emplace_back(weights_.startForNeuron(neuronId), pack[neuronId]);
-        neurons_.back().init();
-    }
-}
-
-Network::Network(Weights weights, const std::string& packName) : weights_(std::move(weights)) {
-    const auto& pack = math::packByName(packName);
-
-    for (unsigned neuronId = 0; neuronId < NEURONS_NUMBER; ++neuronId) {
+    for (size_t neuronId = 0; neuronId < NEURONS_NUMBER; ++neuronId) {
         neurons_.emplace_back(weights_.startForNeuron(neuronId), pack[neuronId]);
     }
 }
-
 
 const Neuron& Network::getNeuron(size_t index) const {
     if (index >= NEURONS_NUMBER) {
@@ -53,6 +42,12 @@ std::vector<const double*> Network::getInputPtrs(const std::vector<double>& inpu
     result.push_back(&BIAS_INPUT);
 
     return result;
+}
+
+void Network::init() {
+    for (auto& neuron: neurons_) {
+        neuron.init();
+    }
 }
 
 double Network::react(const std::vector<double>& inputs) {

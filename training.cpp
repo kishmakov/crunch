@@ -1,11 +1,30 @@
 #include "training.h"
 #include "utilities.h"
 
+const size_t CANDIDATES_NUMBER = 16;
+
 TrainingResult runTraining(const std::vector<Case>& cases,
                            uint64_t iterationsNumber,
                            uint64_t snapshotFrequency,
                            const std::string& packName) {
     network::Network net(packName);
+
+    std::vector<network::Weights> startingCandidates;
+    double minError = 1e10;
+    size_t minId = -1;
+
+    for (size_t currentId = 0; currentId < CANDIDATES_NUMBER; ++currentId) {
+        net.init();
+        startingCandidates.push_back(net.getWeights());
+        double currentError = metricsMSE(cases, net);
+
+        if (currentError < minError) {
+            minError = currentError;
+            minId = currentId;
+        }
+    }
+
+    net = network::Network(packName, startingCandidates[minId]);
 
     TrainingResult tr = {network::Weights::zeroed()};
     tr.packName = packName;

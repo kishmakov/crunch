@@ -9,18 +9,7 @@ namespace network {
 
 const size_t Weights::SIZE = 25;
 
-
 [[maybe_unused]] inline std::string fullWeightsName(const std::string& base) { return base + ".txt"; }
-
-//Weights Weights::randomlyChosen(double min, double max) {
-//    std::vector<double> weights(SIZE, 0.0);
-//
-//    for (size_t i = 0; i < SIZE; ++i) {
-//        weights[i] = randomInRange(min, max);
-//    }
-//
-//    return Weights(std::move(weights));
-//}
 
 Weights Weights::zeroed() {
     std::vector<double> weights(SIZE, 0.0);

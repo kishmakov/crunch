@@ -22,7 +22,7 @@ void plotWeightsAndMSE(const std::string& baseName, const std::vector<Case>& cas
     Plot weightsDistance("-r");
 
     for (const auto& history: tr.history) {
-        network::Network net(history, tr.packName);
+        network::Network net(tr.packName, history);
         targetError += log10(metricsMSE(cases, net));
         weightsDistance += log10(tr.result.distanceL2(history));
     }
@@ -48,10 +48,10 @@ void plotNeurons(const std::string& baseName, TrainingResult& tr) {
             Plot("-r")
     };
 
-    network::Network resulting(tr.result, tr.packName);
+    network::Network resulting(tr.packName, tr.result);
 
     for (const auto& history: tr.history) {
-        network::Network historic(history, tr.packName);
+        network::Network historic(tr.packName, history);
 
         for (size_t id = 0; id < network::Network::NEURONS_NUMBER; ++id) {
             auto hist = historic.getNeuron(id).getWeights();
@@ -86,7 +86,7 @@ void trainNetwork(const std::string& neuronPack) {
 void checkNetwork(const std::string& functionName) {
     auto weights = network::Weights::loadFromFile(functionName);
 
-    network::Network network(weights, functionName);
+    network::Network network(functionName, weights);
 
     unsigned score = 0;
     unsigned total = 0;
