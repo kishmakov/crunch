@@ -28,7 +28,7 @@ TrainingResult runTraining(const std::vector<Case>& cases,
 
     net = network::Network(packName, startingCandidates[minId]);
 
-    TrainingResult tr = {network::Weights::zeroed()};
+    TrainingResult tr;
     tr.packName = packName;
     tr.history.reserve((iterationsNumber + 1) / snapshotFrequency);
 
@@ -42,4 +42,10 @@ TrainingResult runTraining(const std::vector<Case>& cases,
     return std::move(tr);
 }
 
+Training::Training(const std::string& scheme, size_t stepsPerReport) :
+    scheme(scheme),
+    stepsPerReport(stepsPerReport)
+{
+
+}
 } // network

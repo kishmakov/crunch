@@ -10,7 +10,7 @@ namespace network {
 struct Network {
     const static size_t NEURONS_NUMBER;
 
-    explicit Network(const std::string& packName, Weights weights = Weights::zeroed());
+    explicit Network(const std::string& packName, Weights weights = Weights());
 
     [[nodiscard]]
     const Neuron& getNeuron(size_t index) const;

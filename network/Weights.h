@@ -6,11 +6,11 @@
 namespace network {
 
 struct Weights : std::vector<double> {
+    Weights() : std::vector<double>(SIZE, 0.0) {}
     explicit Weights(std::vector<double>&& weights) : std::vector<double>(std::move(weights)) {}
 
     const static size_t SIZE;
 
-    static Weights zeroed();
     static Weights loadFromFile(const std::string& baseName);
 
     Weights& operator-=(const Weights& correction);
