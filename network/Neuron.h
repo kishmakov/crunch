@@ -10,11 +10,12 @@ namespace network {
 struct Neuron {
     const static size_t INPUTS_NUMBER;
 
-    Neuron(double *weights, const std::string& funcName);
+    explicit Neuron(const std::string& funcName);
 
     [[nodiscard]] std::vector<double> getWeights() const;
 
-    void init();
+    void init(double* weights);
+    void shuffle();
     void react(const double** inputs);
 
     [[nodiscard]]

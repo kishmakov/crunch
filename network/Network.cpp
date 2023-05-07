@@ -13,8 +13,10 @@ Network::Network(const std::string& packName, Weights weights) : weights_(std::m
     const auto& pack = math::packByName(packName);
 
     for (size_t neuronId = 0; neuronId < NEURONS_NUMBER; ++neuronId) {
-        neurons_.emplace_back(weights_.startForNeuron(neuronId), pack[neuronId]);
+        neurons_.emplace_back(pack[neuronId]);
     }
+
+    initNeurons();
 }
 
 const Neuron& Network::getNeuron(size_t index) const {
@@ -44,9 +46,20 @@ std::vector<const double*> Network::getInputPtrs(const std::vector<double>& inpu
     return result;
 }
 
-void Network::init() {
+void Network::init(Weights weights) {
+    weights_ = std::move(weights);
+    initNeurons();
+}
+
+void Network::initNeurons() {
+    for (size_t neuronId = 0; neuronId < NEURONS_NUMBER; ++neuronId) {
+        neurons_[neuronId].init(weights_.startForNeuron(neuronId));
+    }
+}
+
+void Network::shuffle() {
     for (auto& neuron: neurons_) {
-        neuron.init();
+        neuron.shuffle();
     }
 }
 

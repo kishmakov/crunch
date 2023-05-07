@@ -18,7 +18,8 @@ struct Network {
     [[nodiscard]]
     const Weights& getWeights() const { return weights_; }
 
-    void init();
+    void init(Weights weights = Weights());
+    void shuffle();
     double react(const std::vector<double>& inputs);
 
     [[nodiscard]]
@@ -31,6 +32,8 @@ private:
 
     [[nodiscard]]
     std::vector<const double*> getInputPtrs(const std::vector<double>& inputs) const;
+
+    void initNeurons();
 
     Weights weights_;
     std::vector<Neuron> neurons_;

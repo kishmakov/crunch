@@ -16,7 +16,7 @@ TrainingResult runTraining(const std::vector<Case>& cases,
     size_t minId = -1;
 
     for (size_t currentId = 0; currentId < CANDIDATES_NUMBER; ++currentId) {
-        net.init();
+        net.shuffle();
         startingCandidates.push_back(net.getWeights());
         double currentError = metricsMSE(cases, net);
 
@@ -26,7 +26,7 @@ TrainingResult runTraining(const std::vector<Case>& cases,
         }
     }
 
-    net = network::Network(packName, startingCandidates[minId]);
+    net.init(startingCandidates[minId]);
 
     TrainingResult tr;
     tr.packName = packName;
