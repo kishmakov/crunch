@@ -10,30 +10,19 @@
 namespace network {
 
 struct Training {
-    explicit Training(const std::string& scheme, size_t stepsPerReport);
+    Training(std::string scheme, size_t stepsPerReport);
+
+    void init(const std::vector<Case>& cases, size_t candidatesNumber);
+    void run(const std::vector<Case>& cases, size_t stepsTotal);
+
+    Network net;
 
     std::string scheme;
     const size_t stepsPerReport;
 
-    network::Weights result;
-    std::vector<network::Weights> history;
+    Weights result;
+    std::vector<Weights> history;
 };
-
-typedef std::vector<network::Weights> WeightsHistory;
-
-struct TrainingResult {
-    network::Weights result;
-    WeightsHistory history;
-    std::string packName;
-
-    inline void takeSnapshot(const Network& net) { history.push_back(net.getWeights()); }
-};
-
-[[maybe_unused]] TrainingResult
-runTraining(const std::vector<Case>& cases,
-            uint64_t iterationsNumber,
-            uint64_t snapshotFrequency,
-            const std::string& packName);
 
 } // network
 

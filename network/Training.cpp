@@ -1,21 +1,22 @@
 #include "network/Training.h"
+
+#include <utility>
 #include "utilities.h"
 
 namespace network {
 
-const size_t CANDIDATES_NUMBER = 16;
+Training::Training(std::string scheme, const size_t stepsPerReport) :
+    net(scheme),
+    scheme(std::move(scheme)),
+    stepsPerReport(stepsPerReport)
+{}
 
-TrainingResult runTraining(const std::vector<Case>& cases,
-                           uint64_t iterationsNumber,
-                           uint64_t snapshotFrequency,
-                           const std::string& packName) {
-    network::Network net(packName);
-
+void Training::init(const std::vector<Case>& cases, size_t candidatesNumber) {
     std::vector<network::Weights> startingCandidates;
     double minError = 1e10;
     size_t minId = -1;
 
-    for (size_t currentId = 0; currentId < CANDIDATES_NUMBER; ++currentId) {
+    for (size_t currentId = 0; currentId < candidatesNumber; ++currentId) {
         net.shuffle();
         startingCandidates.push_back(net.getWeights());
         double currentError = metricsMSE(cases, net);
@@ -27,25 +28,20 @@ TrainingResult runTraining(const std::vector<Case>& cases,
     }
 
     net.init(startingCandidates[minId]);
+}
 
-    TrainingResult tr;
-    tr.packName = packName;
-    tr.history.reserve((iterationsNumber + 1) / snapshotFrequency);
+void Training::run(const std::vector<Case>& cases, size_t stepsTotal) {
+    history.reserve((stepsTotal + 1) / stepsPerReport);
 
-    for (unsigned iteration = 0; iteration < iterationsNumber; ++iteration) {
-        if (iteration % snapshotFrequency == 0) tr.takeSnapshot(net);
-        correctionMSE(cases, net, packName);
+    for (unsigned iteration = 0; iteration < stepsTotal; ++iteration) {
+        if (iteration % stepsPerReport == 0) {
+            history.push_back(net.getWeights());
+        }
+
+        correctionMSE(cases, net);
     }
 
-    tr.result = net.getWeights();
-
-    return std::move(tr);
+    result = net.getWeights();
 }
 
-Training::Training(const std::string& scheme, size_t stepsPerReport) :
-    scheme(scheme),
-    stepsPerReport(stepsPerReport)
-{
-
-}
 } // network

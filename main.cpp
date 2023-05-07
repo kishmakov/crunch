@@ -10,6 +10,7 @@
 #include "utilities.h"
 
 static const size_t RAND_SEED = 20230402;
+static const size_t CANDIDATES_NUMBER = 16;
 
 const std::string MODE_TRAIN = "train";
 const std::string MODE_CHECK = "check";
@@ -17,15 +18,14 @@ const std::string MODE_CHECK = "check";
 
 void plotWeightsAndMSE(const std::string& baseName,
                        const std::vector<Case>& cases,
-                       network::TrainingResult& tr,
-                       size_t stepsPerReport) {
+                       network::Training& training) {
     Plot targetError("-b");
     Plot weightsDistance("-r");
 
-    for (const auto& history: tr.history) {
-        network::Network net(tr.packName, history);
+    for (const auto& history: training.history) {
+        network::Network net(training.scheme, history);
         targetError += log10(metricsMSE(cases, net));
-        weightsDistance += log10(tr.result.distanceL2(history));
+        weightsDistance += log10(training.result.distanceL2(history));
     }
 
     Plotter plotter("Convergence on Training Set");
@@ -33,7 +33,7 @@ void plotWeightsAndMSE(const std::string& baseName,
     plotter.add("MSE on train set", targetError);
     plotter.add("L_{2} weights", weightsDistance);
 
-    plotter.xlabel = "Iteration / " + std::to_string(stepsPerReport);
+    plotter.xlabel = "Iteration / " + std::to_string(training.stepsPerReport);
     plotter.ylabel = "log_{10}";
 
     plotter.draw(baseName + "_mse_error");
@@ -41,8 +41,7 @@ void plotWeightsAndMSE(const std::string& baseName,
 
 // https://github.com/alandefreitas/matplotplusplus/blob/8dbea7d359f7b4f456bca7a6015c32b61ad728f4/source/matplot/util/colors.cpp
 void plotNeurons(const std::string& baseName,
-                 network::TrainingResult& tr,
-                 size_t stepsPerReport) {
+                 network::Training& training) {
     std::vector<Plot> plots = {
             Plot("-b"),
             Plot("-k"),
@@ -51,10 +50,10 @@ void plotNeurons(const std::string& baseName,
             Plot("-r")
     };
 
-    network::Network resulting(tr.packName, tr.result);
+    network::Network resulting(training.scheme, training.result);
 
-    for (const auto& history: tr.history) {
-        network::Network historic(tr.packName, history);
+    for (const auto& history: training.history) {
+        network::Network historic(training.scheme, history);
 
         for (size_t id = 0; id < network::Network::NEURONS_NUMBER; ++id) {
             auto hist = historic.getNeuron(id).getWeights();
@@ -69,7 +68,7 @@ void plotNeurons(const std::string& baseName,
         plotter.add("Neuron #" + std::to_string(id), plots[id]);
     }
 
-    plotter.xlabel = "Iteration / " + std::to_string(stepsPerReport);
+    plotter.xlabel = "Iteration / " + std::to_string(training.stepsPerReport);
     plotter.ylabel = "log_{10} of L_{2}";
 
     plotter.draw(baseName + "_neurons");
@@ -78,18 +77,14 @@ void plotNeurons(const std::string& baseName,
 void trainNetwork(std::string scheme, size_t stepsTotal, size_t stepsPerReport) {
     auto cases = Case::trainingSet();
 
-//    network::Training training(scheme, stepsPerReport);
-//
-//    training.init(CANDIDATES_NUMBER);
-//    training.run(cases, stepsTotal);
-//    training.result.saveToFile(scheme);
+    network::Training training(scheme, stepsPerReport);
 
-    auto tr = network::runTraining(cases, stepsTotal, stepsPerReport, scheme);
+    training.init(cases, CANDIDATES_NUMBER);
+    training.run(cases, stepsTotal);
+    training.result.saveToFile(scheme);
 
-    tr.result.saveToFile(scheme);
-
-    plotWeightsAndMSE(scheme, cases, tr, stepsPerReport);
-    plotNeurons(scheme, tr, stepsPerReport);
+    plotWeightsAndMSE(scheme, cases, training);
+    plotNeurons(scheme, training);
 }
 
 void checkNetwork(const std::string& functionName) {

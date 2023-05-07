@@ -24,6 +24,6 @@ void Plotter::draw(const std::string& baseName) {
     matplot::ylabel(ylabel);
     matplot::xlabel(xlabel);
     matplot::title(title_);
-    matplot::save(baseName + ".svg");
+    matplot::save("results/" + baseName + ".svg");
     matplot::cla();
 }
