@@ -33,7 +33,7 @@ Weights Weights::loadFromFile(const std::string& baseName) {
 
 Weights& Weights::operator-=(const Weights& correction) {
     for (size_t i = 0; i < SIZE; i++) {
-        weights_[i] -= correction.weights_[i];
+        at(i) -= correction[i];
     }
 
     return *this;
@@ -41,49 +41,33 @@ Weights& Weights::operator-=(const Weights& correction) {
 
 Weights& Weights::operator+=(const Weights& correction) {
     for (size_t i = 0; i < SIZE; i++) {
-        weights_[i] += correction.weights_[i];
+        at(i) += correction[i];
     }
 
     return *this;
 }
 
 Weights& Weights::operator*=(double mult) {
-    for (auto& w: weights_) {
+    for (auto& w: *this) {
         w *= mult;
     }
 
     return *this;
 }
 
-double& Weights::operator[](size_t index) {
-    if (index >= SIZE) {
-        throw std::out_of_range("Index out of range");
-    }
-
-    return weights_[index];
-}
-
-const double& Weights::operator[](size_t index) const {
-    if (index >= SIZE) {
-        throw std::out_of_range("Index out of range");
-    }
-
-    return weights_[index];
-}
-
 double* Weights::startForNeuron(size_t index) {
-    return &weights_[index * Neuron::INPUTS_NUMBER];
+    return &at(index * Neuron::INPUTS_NUMBER);
 }
 
 
 double Weights::distanceL2(const Weights& correction) const {
-    return math::metricsL2(weights_, correction.weights_);
+    return math::metricsL2(*this, correction);
 }
 
 void Weights::saveToFile(const std::string& scheme) {
     std::ofstream fout(fullWeightsName(scheme), std::ios::out);
 
-    for (const auto& w: weights_) {
+    for (const auto& w: *this) {
         fout << std::setprecision(9) << w << std::endl;
     }
 
