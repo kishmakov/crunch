@@ -9,6 +9,18 @@
 
 namespace network {
 
+//struct Training {
+//    explicit Training(const std::string& scheme, size_t stepsPerReport);
+//
+//    std::string scheme;
+//
+//    size_t stepsTotal;
+//    const size_t stepsPerReport;
+//
+//    network::Weights result;
+//    std::vector<network::Weights> history;
+//};
+
 typedef std::vector<network::Weights> WeightsHistory;
 
 struct TrainingResult {
