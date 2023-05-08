@@ -16,7 +16,7 @@ double metricsMSE(const std::vector<Case>& cases, network::Network& net) {
 
 
 void correctionMSE(const std::vector<Case>& cases, network::Network& net) {
-    network::Weights correctionN;
+    network::Weights correctionN(net.getWeights().size());
 
     for (const auto& kase: cases) {
         auto inputs = kase.asInputs();

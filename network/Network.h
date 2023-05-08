@@ -10,7 +10,9 @@ namespace network {
 struct Network {
     const static size_t NEURONS_NUMBER;
 
-    explicit Network(const std::string& packName, Weights weights = Weights());
+    explicit Network(const std::string& scheme);
+
+    Network(const std::string& scheme, Weights weights);
 
     [[nodiscard]]
     const Neuron& getNeuron(size_t index) const;
@@ -18,7 +20,7 @@ struct Network {
     [[nodiscard]]
     const Weights& getWeights() const { return weights_; }
 
-    void init(Weights weights = Weights());
+    void init(Weights weights = Weights(NEURONS_NUMBER * Neuron::INPUTS_NUMBER));
     void shuffle();
     double react(const std::vector<double>& inputs);
 
@@ -33,6 +35,7 @@ private:
     [[nodiscard]]
     std::vector<const double*> getInputPtrs(const std::vector<double>& inputs) const;
 
+    void buildNeurons(const std::string& scheme);
     void initNeurons();
 
     Weights weights_;

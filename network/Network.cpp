@@ -7,15 +7,21 @@ namespace network {
 const size_t Network::NEURONS_NUMBER = 5;
 const double Network::BIAS_INPUT = 1.0;
 
-Network::Network(const std::string& packName, Weights weights) : weights_(std::move(weights)) {
-    neurons_.reserve(NEURONS_NUMBER);
+Network::Network(const std::string& scheme) :
+        weights_(NEURONS_NUMBER * Neuron::INPUTS_NUMBER)
+{
+    buildNeurons(scheme);
+    initNeurons();
+}
 
-    const auto& pack = math::packByName(packName);
-
-    for (size_t neuronId = 0; neuronId < NEURONS_NUMBER; ++neuronId) {
-        neurons_.emplace_back(pack[neuronId]);
+Network::Network(const std::string& scheme, Weights weights) :
+    weights_(std::move(weights))
+{
+    if (weights_.size() != NEURONS_NUMBER * Neuron::INPUTS_NUMBER) {
+        throw std::runtime_error("wrong weights provided");
     }
 
+    buildNeurons(scheme);
     initNeurons();
 }
 
@@ -101,6 +107,14 @@ Weights Network::backPropagation(double delta, const std::vector<double>& inputs
 Network& Network::operator+=(const Weights& correction) {
     weights_ += correction;
     return *this;
+}
+
+void Network::buildNeurons(const std::string& scheme) {
+    const auto& pack = math::packByName(scheme);
+
+    for (size_t neuronId = 0; neuronId < NEURONS_NUMBER; ++neuronId) {
+        neurons_.emplace_back(pack[neuronId]);
+    }
 }
 
 } // network

@@ -7,8 +7,6 @@
 
 namespace network {
 
-const size_t Weights::SIZE = 25;
-
 [[maybe_unused]] inline std::string fullWeightsName(const std::string& scheme) { return "results/" + scheme + ".txt"; }
 
 Weights Weights::loadFromFile(const std::string& baseName) {
@@ -27,7 +25,9 @@ Weights Weights::loadFromFile(const std::string& baseName) {
 }
 
 Weights& Weights::operator-=(const Weights& correction) {
-    for (size_t i = 0; i < SIZE; i++) {
+    assert(size() == correction.size());
+
+    for (size_t i = 0; i < size(); i++) {
         at(i) -= correction[i];
     }
 
@@ -35,7 +35,9 @@ Weights& Weights::operator-=(const Weights& correction) {
 }
 
 Weights& Weights::operator+=(const Weights& correction) {
-    for (size_t i = 0; i < SIZE; i++) {
+    assert(size() == correction.size());
+
+    for (size_t i = 0; i < size(); i++) {
         at(i) += correction[i];
     }
 

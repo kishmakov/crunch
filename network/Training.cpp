@@ -1,6 +1,6 @@
-#include "network/Training.h"
-
 #include <utility>
+
+#include "network/Training.h"
 #include "utilities.h"
 
 namespace network {
@@ -8,7 +8,8 @@ namespace network {
 Training::Training(std::string scheme, const size_t stepsPerReport) :
     net(scheme),
     scheme(std::move(scheme)),
-    stepsPerReport(stepsPerReport)
+    stepsPerReport(stepsPerReport),
+    result(0)
 {}
 
 void Training::init(const std::vector<Case>& cases, size_t candidatesNumber) {

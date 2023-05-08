@@ -6,10 +6,8 @@
 namespace network {
 
 struct Weights : std::vector<double> {
-    Weights() : std::vector<double>(SIZE, 0.0) {}
+    explicit Weights(size_t size) : std::vector<double>(size, 0.0) {}
     explicit Weights(std::vector<double>&& weights) : std::vector<double>(std::move(weights)) {}
-
-    const static size_t SIZE;
 
     static Weights loadFromFile(const std::string& baseName);
 
