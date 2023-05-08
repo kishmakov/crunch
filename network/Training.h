@@ -20,8 +20,8 @@ struct Training {
     std::string scheme;
     const size_t stepsPerReport;
 
-    Weights result;
-    std::vector<Weights> history;
+    WeightsUP result;
+    std::vector<WeightsUP> history;
 };
 
 } // network

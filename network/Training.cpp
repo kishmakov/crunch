@@ -9,17 +9,17 @@ Training::Training(std::string scheme, const size_t stepsPerReport) :
     net(scheme),
     scheme(std::move(scheme)),
     stepsPerReport(stepsPerReport),
-    result(0)
+    result(nullptr)
 {}
 
 void Training::init(const std::vector<Case>& cases, size_t candidatesNumber) {
-    std::vector<network::Weights> startingCandidates;
+    std::vector<WeightsUP> startingCandidates;
     double minError = 1e10;
     size_t minId = -1;
 
     for (size_t currentId = 0; currentId < candidatesNumber; ++currentId) {
         net.shuffle();
-        startingCandidates.push_back(net.getWeights());
+        startingCandidates.emplace_back(new Weights(net.getWeights()));
         double currentError = metricsMSE(cases, net);
 
         if (currentError < minError) {
@@ -28,7 +28,7 @@ void Training::init(const std::vector<Case>& cases, size_t candidatesNumber) {
         }
     }
 
-    net.init(startingCandidates[minId]);
+    net.init(std::move(startingCandidates[minId]));
 }
 
 void Training::run(const std::vector<Case>& cases, size_t stepsTotal) {
@@ -36,13 +36,13 @@ void Training::run(const std::vector<Case>& cases, size_t stepsTotal) {
 
     for (unsigned iteration = 0; iteration < stepsTotal; ++iteration) {
         if (iteration % stepsPerReport == 0) {
-            history.push_back(net.getWeights());
+            history.emplace_back(new Weights(net.getWeights()));
         }
 
         correctionMSE(cases, net);
     }
 
-    result = net.getWeights();
+    result.reset(new Weights(net.getWeights()));
 }
 
 } // network

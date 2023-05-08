@@ -21,6 +21,8 @@ struct Weights : std::vector<double> {
     void saveToFile(const std::string& scheme);
 };
 
+typedef std::unique_ptr<Weights> WeightsUP;
+
 } // network
 
 #endif //CRUNCH_WEIGHTS_H

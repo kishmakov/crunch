@@ -1,5 +1,6 @@
 #include "Network.h"
 
+#include <memory>
 #include <utility>
 
 namespace network {
@@ -7,23 +8,40 @@ namespace network {
 const size_t Network::NEURONS_NUMBER = 5;
 const double Network::BIAS_INPUT = 1.0;
 
+WeightsUP Network::zeroedWeights() {
+    std::vector<double> weights(NEURONS_NUMBER * Neuron::INPUTS_NUMBER, 0.0);
+    return std::make_unique<Weights>(std::move(weights));
+}
+
 Network::Network(const std::string& scheme) :
-        weights_(NEURONS_NUMBER * Neuron::INPUTS_NUMBER)
+        weights_(zeroedWeights())
 {
     buildNeurons(scheme);
     initNeurons();
 }
 
-Network::Network(const std::string& scheme, Weights weights) :
+Network::Network(const std::string& scheme, WeightsUP weights) :
     weights_(std::move(weights))
 {
-    if (weights_.size() != NEURONS_NUMBER * Neuron::INPUTS_NUMBER) {
+    if (weights_->size() != NEURONS_NUMBER * Neuron::INPUTS_NUMBER) {
         throw std::runtime_error("wrong weights provided");
     }
 
     buildNeurons(scheme);
     initNeurons();
 }
+
+Network::Network(const std::string& scheme, const Weights& weights) :
+        weights_(std::make_unique<network::Weights>(weights))
+{
+    if (weights_->size() != NEURONS_NUMBER * Neuron::INPUTS_NUMBER) {
+        throw std::runtime_error("wrong weights provided");
+    }
+
+    buildNeurons(scheme);
+    initNeurons();
+}
+
 
 const Neuron& Network::getNeuron(size_t index) const {
     if (index >= NEURONS_NUMBER) {
@@ -52,14 +70,14 @@ std::vector<const double*> Network::getInputPtrs(const std::vector<double>& inpu
     return result;
 }
 
-void Network::init(Weights weights) {
+void Network::init(WeightsUP weights) {
     weights_ = std::move(weights);
     initNeurons();
 }
 
 void Network::initNeurons() {
     for (size_t neuronId = 0; neuronId < NEURONS_NUMBER; ++neuronId) {
-        neurons_[neuronId].init(weights_.startForNeuron(neuronId));
+        neurons_[neuronId].init(weights_->startForNeuron(neuronId));
     }
 }
 
@@ -105,7 +123,7 @@ Weights Network::backPropagation(double delta, const std::vector<double>& inputs
 }
 
 Network& Network::operator+=(const Weights& correction) {
-    weights_ += correction;
+    *weights_ += correction;
     return *this;
 }
 

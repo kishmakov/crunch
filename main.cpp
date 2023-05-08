@@ -23,9 +23,9 @@ void plotWeightsAndMSE(const std::string& baseName,
     Plot weightsDistance("-r");
 
     for (const auto& history: training.history) {
-        network::Network net(training.scheme, history);
+        network::Network net(training.scheme, *history);
         targetError += log10(metricsMSE(cases, net));
-        weightsDistance += log10(training.result.distanceL2(history));
+        weightsDistance += log10(training.result->distanceL2(*history));
     }
 
     Plotter plotter("Convergence on Training Set");
@@ -50,10 +50,10 @@ void plotNeurons(const std::string& baseName,
             Plot("-r")
     };
 
-    network::Network resulting(training.scheme, training.result);
+    network::Network resulting(training.scheme, *training.result);
 
     for (const auto& history: training.history) {
-        network::Network historic(training.scheme, history);
+        network::Network historic(training.scheme, *history);
 
         for (size_t id = 0; id < network::Network::NEURONS_NUMBER; ++id) {
             auto hist = historic.getNeuron(id).getWeights();
@@ -81,7 +81,7 @@ void trainNetwork(std::string scheme, size_t stepsTotal, size_t stepsPerReport) 
 
     training.init(cases, CANDIDATES_NUMBER);
     training.run(cases, stepsTotal);
-    training.result.saveToFile(scheme);
+    training.result->saveToFile(scheme);
 
     plotWeightsAndMSE(scheme, cases, training);
     plotNeurons(scheme, training);
