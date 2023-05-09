@@ -55,16 +55,14 @@ void plotNeurons(const std::string& baseName,
     for (const auto& history: training.history) {
         network::Network historic(training.scheme, *history);
 
-        for (size_t id = 0; id < network::Network::NEURONS_NUMBER; ++id) {
-            auto hist = historic.getNeuron(id).getWeights();
-            auto res = resulting.getNeuron(id).getWeights();
-            plots[id] += log10(math::metricsL2(hist, res));
+        for (size_t id = 0; id < resulting.getNeuronsNumber(); ++id) {
+            plots[id] += log10(math::metricsL2(historic.getNeuron(id), resulting.getNeuron(id)));
         }
     }
 
     Plotter plotter("Neurons on Training Set");
 
-    for (size_t id = 0; id < network::Network::NEURONS_NUMBER; ++id) {
+    for (size_t id = 0; id < resulting.getNeuronsNumber(); ++id) {
         plotter.add("Neuron #" + std::to_string(id), plots[id]);
     }
 

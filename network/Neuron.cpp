@@ -2,81 +2,60 @@
 
 namespace network {
 
-const size_t Neuron::INPUTS_NUMBER = 5;
 
-Neuron::Neuron(const std::string& funcName) :
-    weights_(nullptr),
+Neuron::Neuron(const std::string& funcName, DoublePs weights) : DoublePs(std::move(weights)),
     af_(math::activationByName(funcName))
 {}
 
-std::vector<double> Neuron::getWeights() const {
-    std::vector<double> result;
-    result.reserve(INPUTS_NUMBER);
-
-    for (size_t id = 0; id < INPUTS_NUMBER; ++id) {
-        result.push_back(weights_[id]);
+void Neuron::init(double* weights) {
+    for (auto& weightPointer: *this) {
+        weightPointer = weights++;
     }
-
-    return result;
 }
 
-void Neuron::init(double* weights) {
-    weights_ = weights;
+void Neuron::initInputs(DoubleCPs inputs) {
+    inputs_ = std::move(inputs);
 }
 
 void Neuron::shuffle() {
-    if (weights_ == nullptr) {
-        throw std::runtime_error("shuffle requires neuron initialisation");
-    }
-
-    double* weight = weights_;
-    for (size_t inputId = 0; inputId < INPUTS_NUMBER; ++inputId) {
-        *weight++ = af_.init(inputId);
+    for (size_t id = 0; id < size(); ++id) {
+        *at(id) = af_.init(id);
     }
 }
 
-
-void Neuron::react(const double** inputs) {
-    if (weights_ == nullptr) {
-        throw std::runtime_error("react requires neuron initialisation");
-    }
-
+void Neuron::react() {
     double sum = 0;
 
-    const double* weight = weights_;
-    const double** input = inputs;
+    auto input = inputs_.cbegin();
 
-    for (size_t inputId = 0; inputId < INPUTS_NUMBER; ++inputId) {
-        sum += *weight++ * **input++;
+    for (size_t id = 0; id < size(); ++id) {
+        sum += *at(id) * **input++;
     }
 
     value = af_.function(sum);
     derivative = af_.derivative(sum);
 }
 
-std::vector<double> Neuron::backPropagationWeights(double delta, const double* const* inputs) const {
-    std::vector<double> result;
-    result.reserve(INPUTS_NUMBER);
+std::vector<double> Neuron::backPropagationWeights(double delta) const {
+    std::vector<double> result(size(), 0.0);
 
-    const double* const* input = inputs;
+    auto input = inputs_.begin();
     delta *= derivative;
 
-    for (size_t linkId = 0; linkId < INPUTS_NUMBER; ++linkId) {
-        result.push_back(delta * **input++);
+    for (size_t id = 0; id < size(); ++id) {
+        result[id] = delta * **input++;
     }
 
     return result;
 }
 
 std::vector<double> Neuron::backPropagationInputs(double delta) const {
-    std::vector<double> result;
-    result.reserve(INPUTS_NUMBER);
+    std::vector<double> result(size(), 0.0);
 
-    const double* weight = weights_;
     delta *= derivative;
 
-    for (size_t linkId = 0; linkId < INPUTS_NUMBER; ++linkId) {
-        result.push_back(delta * *weight++);
+    for (size_t id = 0; id < size(); ++id) {
+        result[id] = delta * *at(id);
     }
 
     return result;

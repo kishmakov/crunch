@@ -21,7 +21,7 @@ void correctionMSE(const std::vector<Case>& cases, network::Network& net) {
     for (const auto& kase: cases) {
         auto inputs = kase.asInputs();
         double actual = net.react(inputs);
-        auto newC = net.backPropagation(actual - kase.getTarget(), inputs);
+        auto newC = net.backPropagation(actual - kase.getTarget());
         correctionN += newC;
     }
 

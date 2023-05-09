@@ -1,73 +1,43 @@
-#include "Network.h"
-
+#include <fstream>
+#include <sstream>
 #include <memory>
 #include <utility>
 
+#include "Network.h"
+
 namespace network {
 
-const size_t Network::NEURONS_NUMBER = 5;
 const double Network::BIAS_INPUT = 1.0;
 
-WeightsUP Network::zeroedWeights() {
-    std::vector<double> weights(NEURONS_NUMBER * Neuron::INPUTS_NUMBER, 0.0);
+WeightsUP Network::zeroedWeights(size_t size) {
+    std::vector<double> weights(size, 0.0);
     return std::make_unique<Weights>(std::move(weights));
 }
 
-Network::Network(const std::string& scheme) :
-        weights_(zeroedWeights())
-{
+Network::Network(const std::string& scheme) {
     buildNeurons(scheme);
-    initNeurons();
-}
-
-Network::Network(const std::string& scheme, WeightsUP weights) :
-    weights_(std::move(weights))
-{
-    if (weights_->size() != NEURONS_NUMBER * Neuron::INPUTS_NUMBER) {
-        throw std::runtime_error("wrong weights provided");
-    }
-
-    buildNeurons(scheme);
+    weights_ = zeroedWeights(weightsSize_);
     initNeurons();
 }
 
 Network::Network(const std::string& scheme, const Weights& weights) :
         weights_(std::make_unique<network::Weights>(weights))
 {
-    if (weights_->size() != NEURONS_NUMBER * Neuron::INPUTS_NUMBER) {
+    buildNeurons(scheme);
+
+    if (weights_->size() != weightsSize_) {
         throw std::runtime_error("wrong weights provided");
     }
 
-    buildNeurons(scheme);
     initNeurons();
 }
 
-
 const Neuron& Network::getNeuron(size_t index) const {
-    if (index >= NEURONS_NUMBER) {
+    if (index >= getNeuronsNumber()) {
         throw std::out_of_range("Index out of range");
     }
 
     return neurons_[index];
-}
-
-std::vector<const double*> Network::getInputPtrs(const std::vector<double>& inputs) const {
-    std::vector<const double*> result;
-    result.reserve(2 * Neuron::INPUTS_NUMBER);
-
-    for (const auto& input: inputs) {
-        result.push_back(&input);
-    }
-
-    result.push_back(&BIAS_INPUT);
-
-    for (size_t neuronId = 0; neuronId + 1 < NEURONS_NUMBER; ++neuronId) {
-        result.push_back(&neurons_[neuronId].value);
-    }
-
-    result.push_back(&BIAS_INPUT);
-
-    return result;
 }
 
 void Network::init(WeightsUP weights) {
@@ -76,8 +46,11 @@ void Network::init(WeightsUP weights) {
 }
 
 void Network::initNeurons() {
-    for (size_t neuronId = 0; neuronId < NEURONS_NUMBER; ++neuronId) {
-        neurons_[neuronId].init(weights_->startForNeuron(neuronId));
+    size_t weightsOffset = 0;
+
+    for (auto& neuron: neurons_) {
+        neuron.init(&weights_->at(weightsOffset));
+        weightsOffset += neuron.size();
     }
 }
 
@@ -88,32 +61,30 @@ void Network::shuffle() {
 }
 
 double Network::react(const std::vector<double>& inputs) {
-    auto inputsPtrs = getInputPtrs(inputs);
+    assert(inputs.size() == inputs_.size());
 
-    for (size_t neuronId = 0; neuronId + 1 < NEURONS_NUMBER; ++neuronId) {
-        neurons_[neuronId].react(&inputsPtrs[0]);
+    for (size_t id = 0; id < inputs.size(); ++id) {
+        inputs_[id] = inputs[id];
     }
 
-    neurons_[NEURONS_NUMBER - 1].react(&inputsPtrs[Neuron::INPUTS_NUMBER]);
-    return neurons_[NEURONS_NUMBER - 1].value;
+    for (auto& neuron: neurons_) {
+        neuron.react();
+    }
+
+    return neurons_.back().value;
 }
 
-Weights Network::backPropagation(double delta, const std::vector<double>& inputs) const {
-    auto inputsPtrs = getInputPtrs(inputs);
-    auto deltas = neurons_[NEURONS_NUMBER - 1].backPropagationInputs(delta);
-    deltas[NEURONS_NUMBER - 1] = delta;
+Weights Network::backPropagation(double delta) const {
+    auto deltas = neurons_.back().backPropagationInputs(delta);
+    deltas[getNeuronsNumber() - 1] = delta;
 
     std::vector<double> result;
-    result.reserve(NEURONS_NUMBER * Neuron::INPUTS_NUMBER);
+    result.reserve(weightsSize_);
 
     size_t neuronId = 0;
 
     for (const auto& neuron: neurons_) {
-        const double* const* inputs = (neuronId + 1 < NEURONS_NUMBER)
-                ? &inputsPtrs[0]
-                : &inputsPtrs[Neuron::INPUTS_NUMBER];
-
-        auto partial = neuron.backPropagationWeights(deltas[neuronId], inputs);
+        auto partial = neuron.backPropagationWeights(deltas[neuronId]);
         result.insert(result.end(), partial.begin(), partial.end());
 
         ++neuronId;
@@ -127,11 +98,52 @@ Network& Network::operator+=(const Weights& correction) {
     return *this;
 }
 
-void Network::buildNeurons(const std::string& scheme) {
-    const auto& pack = math::packByName(scheme);
+std::string fullSchemeName(const std::string& scheme) { return "schemes/" + scheme + ".txt"; }
 
-    for (size_t neuronId = 0; neuronId < NEURONS_NUMBER; ++neuronId) {
-        neurons_.emplace_back(pack[neuronId]);
+typedef std::vector<int> NeuronInputs;
+
+void Network::buildNeurons(const std::string& scheme) {
+    size_t inputsSize = 0;
+    weightsSize_ = 0;
+    std::vector<NeuronInputs> neuronsInputs;
+
+    std::ifstream networkAsFile(fullSchemeName(scheme));
+
+    std::string neuronAsLine;
+    while (std::getline(networkAsFile, neuronAsLine)) {
+        std::istringstream neuronSerialized(neuronAsLine);
+        std::string activationFunction;
+        NeuronInputs neuronInputs;
+
+        neuronSerialized >> activationFunction;
+
+        int inputId;
+        while (neuronSerialized >> inputId) {
+            neuronInputs.push_back(inputId);
+            if (inputId < 0) {
+                inputsSize = std::max(inputsSize, size_t(-inputId));
+            }
+        }
+
+        neurons_.emplace_back(activationFunction, DoublePs(neuronInputs.size() + 1, nullptr));
+        neuronsInputs.push_back(std::move(neuronInputs));
+    }
+
+    networkAsFile.close();
+
+    inputs_.resize(inputsSize);
+
+    for (size_t id = 0; id < neuronsInputs.size(); ++id) {
+        DoubleCPs inputs;
+        for (int num: neuronsInputs[id]) {
+            inputs.push_back(num < 0 ? &inputs_[-1 - num] : &neurons_[num - 1].value);
+        }
+
+        inputs.push_back(&BIAS_INPUT);
+
+        weightsSize_ += inputs.size();
+
+        neurons_[id].initInputs(std::move(inputs));
     }
 }
 

@@ -8,13 +8,14 @@
 namespace network {
 
 struct Network {
-    const static size_t NEURONS_NUMBER;
-
-    static WeightsUP zeroedWeights();
+    static WeightsUP zeroedWeights(size_t size);
 
     explicit Network(const std::string& scheme);
-    Network(const std::string& scheme, WeightsUP weights);
     Network(const std::string& scheme, const Weights& weights);
+
+    [[nodiscard]] size_t getNeuronsNumber() const {
+        return neurons_.size();
+    }
 
     [[nodiscard]]
     const Neuron& getNeuron(size_t index) const;
@@ -22,26 +23,25 @@ struct Network {
     [[nodiscard]]
     const Weights& getWeights() const { return *weights_; }
 
-    void init(WeightsUP weights = zeroedWeights());
+    void init(WeightsUP weights);
     void shuffle();
     double react(const std::vector<double>& inputs);
 
     [[nodiscard]]
-    Weights backPropagation(double delta, const std::vector<double>& inputs) const;
+    Weights backPropagation(double delta) const;
 
     Network& operator+=(const Weights& correction);
 
 private:
     const static double BIAS_INPUT;
 
-    [[nodiscard]]
-    std::vector<const double*> getInputPtrs(const std::vector<double>& inputs) const;
-
     void buildNeurons(const std::string& scheme);
     void initNeurons();
 
+    size_t weightsSize_;
     WeightsUP weights_;
     std::vector<Neuron> neurons_;
+    std::vector<double> inputs_;
 };
 
 } // network

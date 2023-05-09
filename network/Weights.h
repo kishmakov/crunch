@@ -15,7 +15,6 @@ struct Weights : std::vector<double> {
     Weights& operator+=(const Weights& correction);
     Weights& operator*=(double mult);
 
-    double* startForNeuron(size_t index);
     double distanceL2(const Weights& correction) const;
 
     void saveToFile(const std::string& scheme);

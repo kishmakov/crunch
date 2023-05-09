@@ -29,4 +29,6 @@ add_executable(crunch
         network/Weights.h
 )
 
+target_compile_options(crunch PUBLIC ${CMAKE_C_FLAGS} -O3)
+
 target_link_libraries(crunch /opt/homebrew/Cellar/matplotplusplus/1.1.0_3/lib/libmatplot.dylib)

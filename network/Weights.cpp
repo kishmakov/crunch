@@ -7,11 +7,11 @@
 
 namespace network {
 
-[[maybe_unused]] inline std::string fullWeightsName(const std::string& scheme) { return "results/" + scheme + ".txt"; }
+[[maybe_unused]] inline std::string fullDstName(const std::string& scheme) { return "results/" + scheme + ".txt"; }
 
 Weights Weights::loadFromFile(const std::string& baseName) {
     std::vector<double> weights;
-    std::ifstream fin(fullWeightsName(baseName));
+    std::ifstream fin(fullDstName(baseName));
 
     double weight;
 
@@ -52,17 +52,12 @@ Weights& Weights::operator*=(double mult) {
     return *this;
 }
 
-double* Weights::startForNeuron(size_t index) {
-    return &at(index * Neuron::INPUTS_NUMBER);
-}
-
-
 double Weights::distanceL2(const Weights& correction) const {
     return math::metricsL2(*this, correction);
 }
 
 void Weights::saveToFile(const std::string& scheme) {
-    std::ofstream fout(fullWeightsName(scheme), std::ios::out);
+    std::ofstream fout(fullDstName(scheme), std::ios::out);
 
     for (const auto& w: *this) {
         fout << std::setprecision(9) << w << std::endl;
