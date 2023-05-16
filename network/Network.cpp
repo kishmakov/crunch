@@ -32,12 +32,19 @@ Network::Network(const std::string& scheme, const Weights& weights) :
     initNeurons();
 }
 
-const Neuron& Network::getNeuron(size_t index) const {
+std::vector<double> Network::getNeuronWeights(size_t index) const {
     if (index >= getNeuronsNumber()) {
         throw std::out_of_range("Index out of range");
     }
 
-    return neurons_[index];
+    std::vector<double> result;
+    result.reserve(neurons_[index].size());
+
+    for (const auto& weightInput: neurons_[index]) {
+        result.push_back(*weightInput.first);
+    }
+
+    return result;
 }
 
 void Network::init(WeightsUP weights) {
@@ -49,7 +56,7 @@ void Network::initNeurons() {
     size_t weightsOffset = 0;
 
     for (auto& neuron: neurons_) {
-        neuron.init(&weights_->at(weightsOffset));
+        neuron.initWeights(&weights_->at(weightsOffset));
         weightsOffset += neuron.size();
     }
 }
@@ -125,7 +132,7 @@ void Network::buildNeurons(const std::string& scheme) {
             }
         }
 
-        neurons_.emplace_back(activationFunction, DoublePs(neuronInputs.size() + 1, nullptr));
+        neurons_.emplace_back(activationFunction, neuronInputs.size() + 1);
         neuronsInputs.push_back(std::move(neuronInputs));
     }
 
@@ -134,7 +141,7 @@ void Network::buildNeurons(const std::string& scheme) {
     inputs_.resize(inputsSize);
 
     for (size_t id = 0; id < neuronsInputs.size(); ++id) {
-        DoubleCPs inputs;
+        std::vector<InputP> inputs;
         for (int num: neuronsInputs[id]) {
             inputs.push_back(num < 0 ? &inputs_[-1 - num] : &neurons_[num - 1].value);
         }

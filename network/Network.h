@@ -18,7 +18,7 @@ struct Network {
     }
 
     [[nodiscard]]
-    const Neuron& getNeuron(size_t index) const;
+    std::vector<double> getNeuronWeights(size_t index) const;
 
     [[nodiscard]]
     const Weights& getWeights() const { return *weights_; }

@@ -2,60 +2,64 @@
 
 namespace network {
 
+const static WeightInput NULLED(nullptr, nullptr);
 
-Neuron::Neuron(const std::string& funcName, DoublePs weights) : DoublePs(std::move(weights)),
+Neuron::Neuron(const std::string& funcName, size_t size) : WeightInputs(size, NULLED),
     af_(math::activationByName(funcName))
 {}
 
-void Neuron::init(double* weights) {
-    for (auto& weightPointer: *this) {
-        weightPointer = weights++;
+void Neuron::initWeights(double* weights) {
+    for (auto& weightInput: *this) {
+        weightInput.first = weights++;
     }
 }
 
-void Neuron::initInputs(DoubleCPs inputs) {
-    inputs_ = std::move(inputs);
+void Neuron::initInputs(const std::vector<InputP>& inputs) {
+    assert(inputs.size() == size());
+
+    auto inputsIterator = inputs.cbegin();
+
+    for (auto& weightInput: *this) {
+        weightInput.second = *inputsIterator++;
+    }
 }
 
 void Neuron::shuffle() {
     for (size_t id = 0; id < size(); ++id) {
-        *at(id) = af_.init(id);
+        *at(id).first = af_.init(id);
     }
 }
 
 void Neuron::react() {
     double sum = 0;
 
-    auto input = inputs_.cbegin();
-
-    for (size_t id = 0; id < size(); ++id) {
-        sum += *at(id) * **input++;
+    for (auto& weightInput: *this) {
+        sum += *weightInput.first * *weightInput.second;
     }
 
     value = af_.function(sum);
     derivative = af_.derivative(sum);
 }
 
-std::vector<double> Neuron::backPropagationWeights(double delta) const {
-    std::vector<double> result(size(), 0.0);
+    std::vector<double> Neuron::backPropagationWeights(double delta) const {
+    std::vector<double> result;
+    result.reserve(size());
 
-    auto input = inputs_.begin();
     delta *= derivative;
-
-    for (size_t id = 0; id < size(); ++id) {
-        result[id] = delta * **input++;
+    for (auto& weightInput: *this) {
+        result.push_back(delta * *weightInput.second);
     }
 
     return result;
 }
 
 std::vector<double> Neuron::backPropagationInputs(double delta) const {
-    std::vector<double> result(size(), 0.0);
+    std::vector<double> result;
+    result.reserve(size());
 
     delta *= derivative;
-
-    for (size_t id = 0; id < size(); ++id) {
-        result[id] = delta * *at(id);
+    for (auto& weightInput: *this) {
+        result.push_back(delta * *weightInput.first);
     }
 
     return result;

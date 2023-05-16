@@ -7,20 +7,22 @@
 
 namespace network {
 
-typedef std::vector<double*> DoublePs;
-typedef std::vector<const double*> DoubleCPs;
+typedef double* WeightP;
+typedef const double* InputP;
+typedef std::pair<WeightP, InputP> WeightInput;
 
-struct Neuron : DoublePs {
-    Neuron(const std::string& funcName, DoublePs weights);
+typedef std::vector<WeightInput> WeightInputs;
 
-    void init(double* weights);
-    void initInputs(DoubleCPs inputs);
+struct Neuron : WeightInputs {
+    Neuron(const std::string& funcName, size_t size);
+
+    void initWeights(double* weights);
+    void initInputs(const std::vector<InputP>& inputs);
 
     void shuffle();
     void react();
 
-    [[nodiscard]]
-    std::vector<double> backPropagationWeights(double delta) const;
+    [[nodiscard]] std::vector<double> backPropagationWeights(double delta) const;
 
     [[nodiscard]] std::vector<double> backPropagationInputs(double delta) const;
 
@@ -28,7 +30,6 @@ struct Neuron : DoublePs {
 
 private:
     double derivative = 0;
-    DoubleCPs inputs_;
     const math::ActivationFunction& af_;
 };
 

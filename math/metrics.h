@@ -6,7 +6,6 @@
 namespace math {
 
 double metricsL2(const std::vector<double>& a, const std::vector<double>& b);
-double metricsL2(const std::vector<double*>& a, const std::vector<double*>& b);
 
 } // math
 

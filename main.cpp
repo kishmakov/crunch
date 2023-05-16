@@ -56,7 +56,7 @@ void plotNeurons(const std::string& baseName,
         network::Network historic(training.scheme, *history);
 
         for (size_t id = 0; id < resulting.getNeuronsNumber(); ++id) {
-            plots[id] += log10(math::metricsL2(historic.getNeuron(id), resulting.getNeuron(id)));
+            plots[id] += log10(math::metricsL2(historic.getNeuronWeights(id), resulting.getNeuronWeights(id)));
         }
     }
 
