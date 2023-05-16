@@ -28,7 +28,7 @@ void Training::init(const std::vector<Case>& cases, size_t candidatesNumber) {
         }
     }
 
-    net.init(std::move(startingCandidates[minId]));
+    net.bindWeights(std::move(startingCandidates[minId]));
 }
 
 void Training::run(const std::vector<Case>& cases, size_t stepsTotal) {

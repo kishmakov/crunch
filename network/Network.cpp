@@ -7,7 +7,7 @@
 
 namespace network {
 
-const double Network::BIAS_INPUT = 1.0;
+const double BIAS_INPUT = 1.0;
 
 WeightsUP Network::zeroedWeights(size_t size) {
     std::vector<double> weights(size, 0.0);
@@ -16,20 +16,12 @@ WeightsUP Network::zeroedWeights(size_t size) {
 
 Network::Network(const std::string& scheme) {
     buildNeurons(scheme);
-    weights_ = zeroedWeights(weightsSize_);
-    initNeurons();
+    bindWeights(zeroedWeights(weightsSize_));
 }
 
-Network::Network(const std::string& scheme, const Weights& weights) :
-        weights_(std::make_unique<network::Weights>(weights))
-{
+Network::Network(const std::string& scheme, const Weights& weights) {
     buildNeurons(scheme);
-
-    if (weights_->size() != weightsSize_) {
-        throw std::runtime_error("wrong weights provided");
-    }
-
-    initNeurons();
+    bindWeights(std::make_unique<network::Weights>(weights));
 }
 
 std::vector<double> Network::getNeuronWeights(size_t index) const {
@@ -47,14 +39,11 @@ std::vector<double> Network::getNeuronWeights(size_t index) const {
     return result;
 }
 
-void Network::init(WeightsUP weights) {
+void Network::bindWeights(WeightsUP weights) {
+    assert(weights->size() == weightsSize_);
     weights_ = std::move(weights);
-    initNeurons();
-}
 
-void Network::initNeurons() {
     size_t weightsOffset = 0;
-
     for (auto& neuron: neurons_) {
         neuron.initWeights(&weights_->at(weightsOffset));
         weightsOffset += neuron.size();

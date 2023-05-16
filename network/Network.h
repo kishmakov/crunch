@@ -23,7 +23,7 @@ struct Network {
     [[nodiscard]]
     const Weights& getWeights() const { return *weights_; }
 
-    void init(WeightsUP weights);
+    void bindWeights(WeightsUP weights);
     void shuffle();
     double react(const std::vector<double>& inputs);
 
@@ -33,10 +33,7 @@ struct Network {
     Network& operator+=(const Weights& correction);
 
 private:
-    const static double BIAS_INPUT;
-
     void buildNeurons(const std::string& scheme);
-    void initNeurons();
 
     size_t weightsSize_;
     WeightsUP weights_;
