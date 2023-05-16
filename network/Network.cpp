@@ -139,7 +139,7 @@ void Network::buildNeurons(const std::string& scheme) {
 
         weightsSize_ += inputs.size();
 
-        neurons_[id].initInputs(std::move(inputs));
+        neurons_[id].initInputs(inputs);
     }
 }
 
