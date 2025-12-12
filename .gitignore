@@ -3,3 +3,5 @@
 *.jpg
 *.gif
 cmake-build-debug
+
+*.ipynb
