@@ -148,7 +148,7 @@ def train_minimal(epochs=50, lr=1e-3, seed=0):
 
 
 # %%
-model, hist = train_minimal(epochs=10000)
+model, hist = train_minimal(epochs=15000)
 
 # Visualize train/test MSE
 plt.figure(figsize=(7, 4))
@@ -161,5 +161,3 @@ plt.legend()
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()
-
-# %%

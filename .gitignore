@@ -4,5 +4,4 @@
 *.gif
 cmake-build-debug
 
-*.ipynb
 .ipynb_checkpoints
